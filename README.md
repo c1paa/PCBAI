@@ -1,390 +1,178 @@
-# PCBAI — AI-Powered PCB Design Assistant
+# PCBAI — AI-Powered KiCad Schematic Generator
 
-**PCBAI** — это интеллектуальный помощник для проектирования электронных схем в KiCad с использованием искусственного интеллекта.
+**KiCad 9.0 compatible** • **Interactive Dialog** • **Russian Language Support**
 
-## 🎯 Возможности
-
-### ✅ Сейчас работает:
-- **Генерация схем по описанию** — "LED with 330 ohm resistor"
-- **Автоматическая разводка дорожек** — через FreeRouting
-- **Инспекция PCB файлов** — анализ существующих плат
-- **База знаний компонентов** — ATmega328P, DHT22, BMP280, MPU-6050
-
-### 🔄 В разработке:
-- **Диалоговый режим** — ИИ задаёт уточняющие вопросы
-- **Поиск компонентов в интернете** — автоматическое добавление в базу
-- **RAG архитектура** — умный поиск по базе знаний
-- **Генерация символов** — создание новых символов KiCad
-
----
-
-## 🚀 Быстрый старт
-
-### 1. Установка
+## Quick Start
 
 ```bash
-cd /Users/vladglazunov/Documents/algo/PCBAI
-
-# Создать виртуальное окружение
-python3 -m venv venv
+# Activate environment
 source venv/bin/activate
 
-# Установить зависимости
-pip install -e .
+# Start interactive dialog
+pcba dialog
+
+# Or generate directly
+pcba schematic "LED with 330 ohm resistor to Arduino pin 5" -o circuit.kicad_sch
+
+# Open in KiCad
+open circuit.kicad_sch
 ```
 
-### 2. Настройка LLM API
+## Features
 
-**Вариант A: Puter.js (без ключа, безлимитно)**
-```bash
-# knowledge_base/config.json
-{
-  "default_provider": "puter"
-}
-```
+✅ **Interactive Dialog** — Chat with AI to design schematics
+✅ **KiCad 9.0 Format** — Correct symbol libraries and footprints
+✅ **Component Database** — Official KiCad libraries mapped
+✅ **PCB Routing** — FreeRouting integration
+✅ **Validation** — kicad-cli syntax checking
 
-**Вариант B: Google AI Studio (требуется ключ)**
-1. Получить ключ: https://aistudio.google.com/app/apikey
-2. Добавить в `knowledge_base/config.json`:
-```json
-{
-  "default_provider": "google",
-  "api_keys": {"google": "YOUR_KEY"}
-}
-```
+## Commands
 
-**Вариант C: Ollama (локально, безлимитно)**
-```bash
-brew install ollama
-ollama serve &
-ollama pull llama3.2
-```
+| Command | Description |
+|---------|-------------|
+| `pcba dialog` | Interactive AI design session |
+| `pcba schematic "description"` | Generate schematic from text |
+| `pcba route file.kicad_pcb` | Auto-route PCB traces |
+| `pcba validate file.kicad_sch` | Validate with kicad-cli |
+| `pcba check` | System requirements check |
 
-См. подробную инструкцию в [API_SETUP.md](API_SETUP.md)
-
-### 3. Генерация схемы
-
-```bash
-# Простая схема
-pcba schematic "LED with 330 ohm resistor to 5V" -o led.kicad_sch
-
-# Схема с микроконтроллером
-pcba schematic "ATmega328P with DHT22 and BMP280" -o sensor_node.kicad_sch
-
-# Открыть в KiCad
-open led.kicad_sch
-```
-
-### 4. Разводка дорожек
-
-```bash
-# Создать PCB из схемы (в KiCad GUI)
-# File → New → PCB → сохранить как led.kicad_pcb
-# Tools → Update PCB from Schematic
-
-# Автоматическая разводка
-pcba route led.kicad_pcb
-
-# Открыть результат
-open led_routed.kicad_pcb
-```
-
----
-
-## 📋 Команды
-
-| Команда | Описание | Пример |
-|---------|----------|--------|
-| `pcba dialog` | **Интерактивный диалог с AI** | `pcba dialog` |
-| `pcba schematic "описание"` | Создать схему через AI | `pcba schematic "LED circuit"` |
-| `pcba route <file>` | Развести дорожки | `pcba route board.kicad_pcb` |
-| `pcba validate <file>` | **Проверить в KiCad** | `pcba validate schema.kicad_sch` |
-| `pcba inspect <file>` | Показать информацию | `pcba inspect board.kicad_pcb` |
-| `pcba check` | Проверка системы | `pcba check` |
-
----
-
-## 🧠 Как это работает
-
-### Архитектура
+## Example Session
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│  Пользователь: "ATmega328P с DHT22 и BMP280"                │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│  LLM Client (Google/Groq/Puter/Ollama)                      │
-│  - Анализирует описание                                     │
-│  - Извлекает компоненты                                     │
-│  - Определяет интерфейсы                                    │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│  Knowledge Base (components.json)                           │
-│  - Поиск компонентов                                        │
-│  - Pinout, интерфейсы                                       │
-│  - Правила проектирования                                   │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│  Schematic Generator                                        │
-│  - Генерация .kicad_sch в формате KiCad 9.0                 │
-│  - Символы, компоненты, соединения                          │
-└─────────────────────────────────────────────────────────────┘
-                            │
-                            ▼
-┌─────────────────────────────────────────────────────────────┐
-│  KiCad .kicad_sch файл                                      │
-└─────────────────────────────────────────────────────────────┘
+$ pcba dialog
+
+🔹 Вы: Светодиод с резистором к Arduino на pin 5
+
+AI: Понял! Вот схема:
+
+Компоненты:
+  • R1: Резистор 330Ω
+  • LED1: Светодиод красный
+  • U1: ATmega328P
+
+Подключение:
+  • Arduino Pin 5 → Резистор 330Ω
+  • Резистор → Анод светодиода
+  • Катод → GND
+
+Сохранить? (save led.kicad_sch)
+
+🔹 Вы: save led.kicad_sch
+
+✅ Saved: led.kicad_sch
 ```
 
-### Пример AI анализа
-
-**Вход:** `"ATmega328P с DHT22 и BMP280"`
-
-**AI извлекает:**
-```json
-{
-  "components": [
-    {"ref": "U1", "name": "ATmega328P", "category": "mcu"},
-    {"ref": "D1", "name": "DHT22", "category": "sensor"},
-    {"ref": "U2", "name": "BMP280", "category": "sensor"},
-    {"ref": "R1", "type": "resistor", "value": "10k", "purpose": "DHT22 pullup"},
-    {"ref": "R2", "type": "resistor", "value": "4.7k", "purpose": "I2C pullup"},
-    {"ref": "C1", "type": "capacitor", "value": "100nF", "purpose": "decoupling"}
-  ],
-  "interfaces": ["I2C for BMP280", "1-wire for DHT22"],
-  "power": {"positive": "+5V", "ground": "GND"}
-}
-```
-
-**Результат:** Готовая `.kicad_sch` схема со всеми компонентами!
-
----
-
-## 📁 Структура проекта
+## Project Structure
 
 ```
 PCBAI/
 ├── src/pcba/
-│   ├── cli.py              # CLI интерфейс
-│   ├── schematic.py        # AI генератор схем
-│   ├── parser.py           # Парсер .kicad_pcb
-│   ├── exporter.py         # Экспорт в DSN
-│   └── routing.py          # FreeRouting интеграция
-│
+│   ├── cli.py           # CLI commands
+│   ├── dialog.py        # Interactive dialog
+│   ├── schematic.py     # KiCad 9.0 generator
+│   ├── parser.py        # PCB file parser
+│   ├── exporter.py      # DSN exporter
+│   └── routing.py       # FreeRouting integration
 ├── knowledge_base/
-│   ├── components.json     # База компонентов
-│   ├── config.json         # Настройки LLM API
-│   ├── generate_components.py  # Генератор базы через AI
-│   └── README.md
-│
-├── examples/
-│   ├── test1/              # Пример проекта
-│   └── simple_led.kicad_pcb
-│
-├── tools/
-│   └── freerouting.jar     # FreeRouting autorouter
-│
-├── tests/
-├── README.md
-├── API_SETUP.md            # Настройка API ключей
-└── pyproject.toml
+│   ├── config.json      # LLM API config
+│   └── components.json  # Component database
+├── agent_state/         # Session state files
+├── .bin/                # Archived files
+└── README.md            # This file
 ```
 
----
+## Configuration
 
-## 🗄️ База знаний
+### LLM API Setup
 
-### Добавленные компоненты:
+Edit `knowledge_base/config.json`:
 
-**Микроконтроллеры:**
-- ✅ ATmega328P (Arduino Uno/Nano)
-
-**Сенсоры:**
-- ✅ DHT22 (температура/влажность)
-- ✅ BMP280 (давление/температура)
-- ✅ MPU-6050 (акселерометр/гироскоп)
-
-**Пассивные компоненты:**
-- ✅ Резисторы, конденсаторы, светодиоды
-
-### Добавить новый компонент:
-
-```bash
-cd knowledge_base
-
-# Отредактировать generate_components.py
-# Добавить в COMPONENTS_TO_ADD:
-COMPONENTS_TO_ADD = [
-    "ESP32-WROOM-32",
-    "HC-SR04 ultrasonic sensor",
-    # ...
-]
-
-# Запустить генерацию
-python generate_components.py
-```
-
-См. [knowledge_base/README.md](knowledge_base/README.md)
-
----
-
-## 🔧 Настройка LLM API
-
-### Рекомендуемые провайдеры:
-
-| Провайдер | Модель | Лимиты | Ключ | Скорость |
-|-----------|--------|--------|------|----------|
-| **Puter.js** | Gemini | ∞ | ❌ | ⚡⚡ |
-| **Google AI** | Gemini 2.0 | 15 RPM | ✅ | ⚡⚡⚡ |
-| **Groq** | Llama 70B | 30 RPM | ✅ | ⚡⚡⚡⚡ |
-| **Ollama** | Llama 3.2 | ∞ | ❌ | ⚡ |
-
-**Быстрый старт (без ключа):**
-```json
-{
-  "default_provider": "puter"
-}
-```
-
-**Для продакшена:**
 ```json
 {
   "default_provider": "google",
-  "api_keys": {"google": "YOUR_KEY"}
+  "llm_providers": {
+    "google": {
+      "enabled": true,
+      "api_key": "YOUR_GOOGLE_AI_STUDIO_KEY"
+    }
+  }
 }
 ```
 
-Полная инструкция: [API_SETUP.md](API_SETUP.md)
+Get API key: https://aistudio.google.com/app/apikey
 
----
+### Alternatives
 
-## 🧪 Тестирование
+- **Puter.js** — Free, no key needed (set `"default_provider": "puter"`)
+- **Ollama** — Local, unlimited (requires `ollama serve`)
 
-### Тест 1: Простая схема
+## Continuation Guide
+
+### Resume from Another Device
+
 ```bash
-pcba schematic "LED with 330 ohm resistor" -o test1.kicad_sch
-open test1.kicad_sch  # Должно открыться без ошибок
+# Clone repository
+git clone <your-repo-url>
+cd PCBAI
+
+# Read current state
+cat agent_state/project_state.md
+cat agent_state/project_progress.json
+
+# Activate and continue
+source venv/bin/activate
+pcba dialog
 ```
 
-### Тест 2: Схема с MCU
-```bash
-pcba schematic "ATmega328P with DHT22" -o test2.kicad_sch
-open test2.kicad_sch
-```
+### Session State Files
 
-### Тест 3: Разводка
-```bash
-pcba route examples/simple_led.kicad_pcb
-open examples/simple_led_routed.kicad_pcb
-```
+| File | Purpose |
+|------|---------|
+| `agent_state/project_state.md` | Human-readable status |
+| `agent_state/project_progress.json` | Machine-readable progress |
+| `agent_state/task_log.md` | Task history |
+| `IMPLEMENTATION_PLAN.md` | Detailed implementation plan |
 
----
+## Requirements
 
-## 📊 Roadmap
+- **Python 3.10+**
+- **KiCad 9.0** (optional, for validation)
+- **Java** (for FreeRouting)
+- **LLM API** (Google AI Studio / Puter.js / Ollama)
 
-### Этап 1: База знаний ✅ (Март 2026)
-- [x] JSON структура базы компонентов
-- [x] Скрипт генерации через AI
-- [x] Первые 4 компонента
-- [ ] 20+ компонентов
-- [ ] Веб-скрейпер для datasheet
+## Development Status
 
-### Этап 2: LLM API ✅ (Март 2026)
-- [x] Мульти-провайдер клиент
-- [x] Google AI Studio интеграция
-- [x] Groq Cloud интеграция
-- [x] Puter.js (без ключа)
-- [x] Ollama локальная
-- [ ] Автоматический fallback
+**Progress: 85% Complete**
 
-### Этап 3: RAG + Диалог (Апрель 2026)
-- [ ] ChromaDB векторная база
-- [ ] Умный поиск компонентов
-- [ ] Диалоговый режим
-- [ ] Уточняющие вопросы
+- ✅ Core functionality
+- ✅ KiCad 9.0 format
+- ✅ Component database
+- ✅ Dialog mode
+- 🔄 Testing & validation
+- 🔄 Custom symbol generation
 
-### Этап 4: Генерация символов (Май 2026)
-- [ ] Парсинг существующих библиотек
-- [ ] Генерация из pinout
-- [ ] DRC проверка
+## Troubleshooting
 
-### Этап 5: Тестирование (Июнь 2026)
-- [ ] Юнит тесты
-- [ ] Интеграционные тесты
-- [ ] Валидация в KiCad
+### Symbols show as "question marks"
+- Check that component uses correct KiCad 9.0 lib_id
+- Verify symbol library is loaded in KiCad
+- Run `pcba validate file.kicad_sch`
 
----
+### kicad-cli not found
+- Install KiCad 9.0 from https://www.kicad.org/download/
+- Validation will skip if not installed (optional)
 
-## 🤝 Вклад в проект
+### LLM API errors
+- Check API key in `knowledge_base/config.json`
+- Verify internet connection
+- Try fallback provider (Puter.js)
 
-### Добавить компонент в базу:
-1. Fork проекта
-2. Добавить JSON в `knowledge_base/components.json`
-3. Создать pull request
-
-### Улучшить AI:
-1. Предложить лучший prompt для анализа
-2. Добавить поддержку новых интерфейсов
-3. Улучшить генерацию символов
-
----
-
-## 📚 Документация
-
-- [API_SETUP.md](API_SETUP.md) — Настройка LLM API
-- [knowledge_base/README.md](knowledge_base/README.md) — База компонентов
-- [PROJECT_STATUS.md](PROJECT_STATUS.md) — Текущий статус
-- [FINAL_STATUS.md](FINAL_STATUS.md) — Полное описание
-
----
-
-## 📝 Лицензия
+## License
 
 MIT License
 
----
+## Resources
 
-## 💡 Примеры использования
-
-### Пример 1: Датчик температуры
-```bash
-pcba schematic "DHT22 temperature sensor with ATmega328P" -o temp_sensor.kicad_sch
-```
-
-### Пример 2: Метеостанция
-```bash
-pcba schematic "Weather station with BMP280 and DHT22 on ESP32" -o weather.kicad_sch
-```
-
-### Пример 3: LED индикатор
-```bash
-pcba schematic "3 LEDs with current limiting resistors to 5V" -o leds.kicad_sch
-```
-
----
-
-## ⚠️ Ограничения
-
-### Текущие:
-- ❌ Нет диалогового режима (ИИ не задаёт вопросы)
-- ❌ Ограниченная база компонентов (~4 шт)
-- ❌ Нет поиска в интернете
-- ❌ Простая генерация соединений
-
-### Планируется:
-- ✅ Диалоговый режим (Q2 2026)
-- ✅ 50+ компонентов в базе (Q2 2026)
-- ✅ Автоматический поиск datasheet (Q3 2026)
-- ✅ Умная генерация соединений (Q2 2026)
-
----
-
-## 📞 Поддержка
-
-Вопросы и предложения: [GitHub Issues](https://github.com/yourusername/pcba/issues)
+- **KiCad 9.0 Docs:** https://docs.kicad.org/9.0/
+- **Symbol Libraries:** https://gitlab.com/kicad/libraries/kicad-symbols
+- **Footprint Libraries:** https://gitlab.com/kicad/libraries/kicad-footprints
