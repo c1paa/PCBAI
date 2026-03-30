@@ -1,0 +1,157 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual Environment
+venv/
+env/
+ENV/
+.venv
+env.bak/
+venv.bak/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# KiCad project files (generated)
+*.kicad_pcb
+*.kicad_sch
+*.kicad_sym
+*.kicad_mod
+*.kicad_wks
+*.kicad_pro
+*.kicad_dru
+*.lck
+*.dsn
+*.ses
+*.gbr
+*.drl
+*.pos
+*.pdf
+*.svg
+*.step
+*.stp
+*.stl
+*.zip
+*.bak
+*.tmp
+
+# KiCad backups
+*-backup/
+*.kicad_pcb-bak
+*.kicad_sch-bak
+
+# Fab files (generated outputs)
+*.gbr
+*.drl
+*.fab
+*.pdf
+*.png
+*.jpg
+*.bmp
+*.plt
+*.nc
+*. Excellon
+
+# Test outputs
+test_*.kicad_sch
+test_*.kicad_pcb
+*_routed.kicad_pcb
+*_test.kicad_sch
+*_test.kicad_pcb
+
+# Examples (keep structure, remove generated)
+examples/*.kicad_pcb
+examples/*.kicad_sch
+examples/*.dsn
+examples/*.ses
+examples/test*/
+!examples/.gitkeep
+
+# Tools (binaries)
+tools/*.jar
+tools/freerouting.jar
+tools/*.exe
+
+# OS
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+Desktop.ini
+
+# Logs
+*.log
+logs/
+
+# Coverage
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# mypy
+.mypy_cache/
+
+# pyenv
+.python-version
+
+# pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Jupyter
+.ipynb_checkpoints
+
+# Sphinx
+docs/_build/
+
+# pyenv
+.pyenv/
+
+# Poetry
+poetry.lock
+
+# Black
+.black
+
+# Flake8
+.flake8
+
+# isort
+.isort.cfg

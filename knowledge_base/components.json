@@ -1,0 +1,368 @@
+{
+  "metadata": {
+    "version": "1.0.0",
+    "created": "2026-03-30",
+    "description": "PCBAI Component Knowledge Base"
+  },
+  
+  "components": [
+    {
+      "id": "mcu_atmega328p",
+      "name": "ATmega328P",
+      "category": "microcontroller",
+      "manufacturer": "Microchip",
+      "description": "8-bit AVR microcontroller, 32KB Flash, 2KB SRAM, 1KB EEPROM",
+      
+      "package": {
+        "type": "TQFP-32",
+        "kiCad_footprint": "Package_QFP:TQFP-32_7x7mm_P0.8mm",
+        "alternatives": ["QFN-32", "VQFN-32"]
+      },
+      
+      "kiCad_lib_id": "MCU_Microchip_ATmega:ATmega328P",
+      
+      "pins": [
+        {"num": 1, "name": "PD3", "functions": ["GPIO", "INT1", "OC2B"], "bank": "D"},
+        {"num": 2, "name": "PD4", "functions": ["GPIO", "XCK", "OC1B"], "bank": "D"},
+        {"num": 3, "name": "PD5", "functions": ["GPIO", "OC0B", "OC3A"], "bank": "D"},
+        {"num": 4, "name": "PD6", "functions": ["GPIO", "AIN0", "OC0A"], "bank": "D"},
+        {"num": 5, "name": "PD7", "functions": ["GPIO", "AIN1", "OC3B"], "bank": "D"},
+        {"num": 6, "name": "PB0", "functions": ["GPIO", "ICP1", "CLKO", "OC1A"], "bank": "B"},
+        {"num": 7, "name": "PB1", "functions": ["GPIO", "OC1A", "OC1B"], "bank": "B"},
+        {"num": 8, "name": "PB2", "functions": ["GPIO", "AIN1", "OC2A", "MOSI"], "bank": "B"},
+        {"num": 9, "name": "PB3", "functions": ["GPIO", "AIN0", "OC3A", "MISO"], "bank": "B"},
+        {"num": 10, "name": "PB4", "functions": ["GPIO", "OC3B", "SS", "SCK"], "bank": "B"},
+        {"num": 11, "name": "PB5", "functions": ["GPIO", "OC1C", "MOSI"], "bank": "B"},
+        {"num": 12, "name": "PB6", "functions": ["GPIO", "OC1B", "MISO"], "bank": "B"},
+        {"num": 13, "name": "PB7", "functions": ["GPIO", "OC0A", "OC1C", "SCK"], "bank": "B"},
+        {"num": 14, "name": "RESET", "functions": ["RESET"], "type": "power"},
+        {"num": 15, "name": "VCC", "functions": ["POWER"], "type": "power"},
+        {"num": 16, "name": "GND", "functions": ["GROUND"], "type": "power"},
+        {"num": 17, "name": "XTAL2", "functions": ["OSC"], "type": "oscillator"},
+        {"num": 18, "name": "XTAL1", "functions": ["OSC"], "type": "oscillator"},
+        {"num": 19, "name": "PD0", "functions": ["GPIO", "RXD", "PCINT0"], "bank": "D"},
+        {"num": 20, "name": "PD1", "functions": ["GPIO", "TXD", "PCINT1"], "bank": "D"},
+        {"num": 21, "name": "PD2", "functions": ["GPIO", "INT0", "PCINT2"], "bank": "D"},
+        {"num": 22, "name": "PC0", "functions": ["GPIO", "ADC0", "PCINT8"], "bank": "C", "adc": 0},
+        {"num": 23, "name": "PC1", "functions": ["GPIO", "ADC1", "PCINT9"], "bank": "C", "adc": 1},
+        {"num": 24, "name": "PC2", "functions": ["GPIO", "ADC2", "PCINT10"], "bank": "C", "adc": 2},
+        {"num": 25, "name": "PC3", "functions": ["GPIO", "ADC3", "PCINT11"], "bank": "C", "adc": 3},
+        {"num": 26, "name": "PC4", "functions": ["GPIO", "ADC4", "SDA", "PCINT12"], "bank": "C", "adc": 4, "i2c": "SDA"},
+        {"num": 27, "name": "PC5", "functions": ["GPIO", "ADC5", "SCL", "PCINT13"], "bank": "C", "adc": 5, "i2c": "SCL"},
+        {"num": 28, "name": "PC6", "functions": ["GPIO", "ICP", "CLKI", "PCINT14"], "bank": "C"},
+        {"num": 29, "name": "PC7", "functions": ["GPIO", "TOSC2", "PCINT15"], "bank": "C"},
+        {"num": 30, "name": "AVCC", "functions": ["POWER"], "type": "power"},
+        {"num": 31, "name": "AREF", "functions": ["AREF"], "type": "analog"},
+        {"num": 32, "name": "AGND", "functions": ["GROUND"], "type": "power"}
+      ],
+      
+      "power": {
+        "vcc_pins": ["VCC", "AVCC"],
+        "gnd_pins": ["GND", "AGND"],
+        "voltage_min": 1.8,
+        "voltage_max": 5.5,
+        "voltage_typical": 5.0
+      },
+      
+      "interfaces": {
+        "UART": {"count": 1, "pins": {"TX": "PD1", "RX": "PD0"}},
+        "SPI": {"count": 1, "pins": {"MOSI": "PB3", "MISO": "PB4", "SCK": "PB5", "SS": "PB2"}},
+        "I2C": {"count": 1, "pins": {"SDA": "PC4", "SCL": "PC5"}},
+        "ADC": {"count": 6, "pins": ["PC0", "PC1", "PC2", "PC3", "PC4", "PC5"]},
+        "Timers": {"count": 3, "names": ["Timer0", "Timer1", "Timer2"]}
+      },
+      
+      "design_rules": [
+        {
+          "rule": "decoupling_capacitor",
+          "description": "Place 100nF capacitor near each VCC pin",
+          "components": [{"type": "capacitor", "value": "100nF", "placement": "near_VCC"}]
+        },
+        {
+          "rule": "crystal_oscillator",
+          "description": "16MHz crystal with two 22pF load capacitors",
+          "components": [
+            {"type": "crystal", "value": "16MHz", "pins": ["XTAL1", "XTAL2"]},
+            {"type": "capacitor", "value": "22pF", "placement": "XTAL1_to_GND"},
+            {"type": "capacitor", "value": "22pF", "placement": "XTAL2_to_GND"}
+          ]
+        },
+        {
+          "rule": "reset_pullup",
+          "description": "10k pull-up resistor on RESET pin",
+          "components": [{"type": "resistor", "value": "10k", "placement": "RESET_to_VCC"}]
+        }
+      ],
+      
+      "typical_applications": [
+        "Arduino Uno",
+        "Arduino Nano",
+        "Arduino Pro Mini",
+        "Custom embedded systems"
+      ],
+      
+      "datasheet_url": "https://ww1.microchip.com/downloads/en/DeviceDoc/Atmel-7810-Automotive-Microcontrollers-ATmega328P_Datasheet.pdf"
+    },
+    
+    {
+      "id": "sensor_dht22",
+      "name": "DHT22",
+      "category": "sensor",
+      "subcategory": "temperature_humidity",
+      "manufacturer": "Aosong",
+      "description": "Digital temperature and humidity sensor",
+      
+      "package": {
+        "type": "THT-4",
+        "kiCad_footprint": "Package_TO_SOT_THT:TO92-3_W4.58mm_Staggered"
+      },
+      
+      "kiCad_lib_id": "Sensor_Environmental:Aosong_DHT22",
+      
+      "pins": [
+        {"num": 1, "name": "VDD", "type": "power", "description": "Power supply 3.3-6V"},
+        {"num": 2, "name": "DATA", "type": "signal", "description": "Serial data output", "pullup_required": true, "pullup_value": "10k"},
+        {"num": 3, "name": "NC", "type": "no_connect", "description": "Not connected"},
+        {"num": 4, "name": "GND", "type": "power", "description": "Ground"}
+      ],
+      
+      "power": {
+        "voltage_min": 3.3,
+        "voltage_max": 6.0,
+        "voltage_typical": 5.0,
+        "current_max": "2.5mA"
+      },
+      
+      "interfaces": {
+        "1-wire": {
+          "count": 1,
+          "pins": {"DATA": "DATA"},
+          "timing_critical": true,
+          "description": "Single-wire digital protocol"
+        }
+      },
+      
+      "design_rules": [
+        {
+          "rule": "data_pullup",
+          "description": "10k pull-up resistor required on DATA pin",
+          "components": [{"type": "resistor", "value": "10k", "placement": "DATA_to_VDD"}]
+        },
+        {
+          "rule": "decoupling_capacitor",
+          "description": "Place 100nF capacitor near VDD pin",
+          "components": [{"type": "capacitor", "value": "100nF", "placement": "near_VDD"}]
+        }
+      ],
+      
+      "typical_applications": [
+        "Weather stations",
+        "Home automation",
+        "Environmental monitoring"
+      ],
+      
+      "datasheet_url": "https://cdn.sparkfun.com/assets/1/2/3/4/5/DHT22.pdf"
+    },
+    
+    {
+      "id": "sensor_bmp280",
+      "name": "BMP280",
+      "category": "sensor",
+      "subcategory": "pressure_temperature",
+      "manufacturer": "Bosch Sensortec",
+      "description": "Digital barometric pressure and temperature sensor",
+      
+      "package": {
+        "type": "LGA-8",
+        "kiCad_footprint": "Bosch:LGA-8_2.5x2.5mm_P0.95mm",
+        "alternatives": ["LGA-8"]
+      },
+      
+      "kiCad_lib_id": "Sensor_Environmental:Bosch_BMP280",
+      
+      "pins": [
+        {"num": 1, "name": "VCC", "type": "power", "description": "Power supply 1.71-3.6V"},
+        {"num": 2, "name": "GND", "type": "power", "description": "Ground"},
+        {"num": 3, "name": "SDA", "type": "signal", "description": "I2C/SPI data", "i2c": "SDA"},
+        {"num": 4, "name": "SDO", "type": "signal", "description": "I2C address select / SPI MISO", "i2c_address_select": true},
+        {"num": 5, "name": "SCL", "type": "signal", "description": "I2C clock / SPI clock", "i2c": "SCL"},
+        {"num": 6, "name": "CSB", "type": "signal", "description": "Chip select for SPI"},
+        {"num": 7, "name": "SDI", "type": "signal", "description": "SPI MOSI"},
+        {"num": 8, "name": "PS", "type": "signal", "description": "Interface select (0=I2C, 1=SPI)"}
+      ],
+      
+      "power": {
+        "voltage_min": 1.71,
+        "voltage_max": 3.6,
+        "voltage_typical": 3.3,
+        "current_measurement": "2.7uA @ 1Hz"
+      },
+      
+      "interfaces": {
+        "I2C": {
+          "count": 1,
+          "pins": {"SDA": "SDA", "SCL": "SCL"},
+          "addresses": ["0x76", "0x77"],
+          "address_select": "SDO pin (0=0x76, 1=0x77)",
+          "pullup_required": true,
+          "pullup_value": "4.7k"
+        },
+        "SPI": {
+          "count": 1,
+          "pins": {"SDI": "SDI", "SDO": "SDO", "SCL": "SCL", "CSB": "CSB"},
+          "mode": 3
+        }
+      },
+      
+      "design_rules": [
+        {
+          "rule": "i2c_pullups",
+          "description": "4.7k pull-up resistors on SDA and SCL lines",
+          "components": [
+            {"type": "resistor", "value": "4.7k", "placement": "SDA_to_VCC"},
+            {"type": "resistor", "value": "4.7k", "placement": "SCL_to_VCC"}
+          ]
+        },
+        {
+          "rule": "decoupling_capacitor",
+          "description": "Place 100nF capacitor near VCC pin",
+          "components": [{"type": "capacitor", "value": "100nF", "placement": "near_VCC"}]
+        }
+      ],
+      
+      "typical_applications": [
+        "Weather stations",
+        "Altitude measurement",
+        "Indoor navigation",
+        "Fitness tracking"
+      ],
+      
+      "datasheet_url": "https://www.bosch-sensortec.com/media/boschsensortec/downloads/datasheets/bst-bmp280-ds001.pdf"
+    },
+    
+    {
+      "id": "sensor_mpu6050",
+      "name": "MPU-6050",
+      "category": "sensor",
+      "subcategory": "accelerometer_gyroscope",
+      "manufacturer": "InvenSense",
+      "description": "6-axis accelerometer and gyroscope",
+      
+      "package": {
+        "type": "QFN-24",
+        "kiCad_footprint": "InvenSense:QFN-24_4x4mm_P0.5mm"
+      },
+      
+      "kiCad_lib_id": "Sensor_Motion:InvenSense_MPU6050",
+      
+      "pins": [
+        {"num": 1, "name": "XCL", "type": "signal", "description": "Auxiliary I2C clock"},
+        {"num": 2, "name": "XDA", "type": "signal", "description": "Auxiliary I2C data"},
+        {"num": 3, "name": "AD0", "type": "signal", "description": "I2C address select"},
+        {"num": 4, "name": "REGOUT", "type": "power", "description": "Regulator filter capacitor"},
+        {"num": 5, "name": "VLOGIC", "type": "power", "description": "Digital I/O supply"},
+        {"num": 6, "name": "CLKIN", "type": "signal", "description": "Clock input"},
+        {"num": 7, "name": "FSYNC", "type": "signal", "description": "Frame sync"},
+        {"num": 8, "name": "INT", "type": "signal", "description": "Interrupt"},
+        {"num": 9, "name": "VDD", "type": "power", "description": "Power supply 2.375-3.46V"},
+        {"num": 10, "name": "GND", "type": "power", "description": "Ground"},
+        {"num": 11, "name": "GND", "type": "power", "description": "Ground"},
+        {"num": 12, "name": "GND", "type": "power", "description": "Ground"},
+        {"num": 13, "name": "GND", "type": "power", "description": "Ground"},
+        {"num": 14, "name": "GND", "type": "power", "description": "Ground"},
+        {"num": 15, "name": "GND", "type": "power", "description": "Ground"},
+        {"num": 16, "name": "GND", "type": "power", "description": "Ground"},
+        {"num": 17, "name": "GND", "type": "power", "description": "Ground"},
+        {"num": 18, "name": "GND", "type": "power", "description": "Ground"},
+        {"num": 19, "name": "GND", "type": "power", "description": "Ground"},
+        {"num": 20, "name": "GND", "type": "power", "description": "Ground"},
+        {"num": 21, "name": "GND", "type": "power", "description": "Ground"},
+        {"num": 22, "name": "GND", "type": "power", "description": "Ground"},
+        {"num": 23, "name": "GND", "type": "power", "description": "Ground"},
+        {"num": 24, "name": "GND", "type": "power", "description": "Ground"}
+      ],
+      
+      "power": {
+        "voltage_min": 2.375,
+        "voltage_max": 3.46,
+        "voltage_typical": 3.3
+      },
+      
+      "interfaces": {
+        "I2C": {
+          "count": 1,
+          "pins": {"SDA": "XDA", "SCL": "XCL"},
+          "addresses": ["0x68", "0x69"],
+          "address_select": "AD0 pin (0=0x68, 1=0x69)",
+          "pullup_required": true,
+          "pullup_value": "4.7k"
+        }
+      },
+      
+      "design_rules": [
+        {
+          "rule": "i2c_pullups",
+          "description": "4.7k pull-up resistors on SDA and SCL lines",
+          "components": [
+            {"type": "resistor", "value": "4.7k", "placement": "SDA_to_VCC"},
+            {"type": "resistor", "value": "4.7k", "placement": "SCL_to_VCC"}
+          ]
+        },
+        {
+          "rule": "decoupling_capacitor",
+          "description": "Place 100nF capacitor near VDD pin",
+          "components": [{"type": "capacitor", "value": "100nF", "placement": "near_VDD"}]
+        }
+      ],
+      
+      "typical_applications": [
+        "Motion tracking",
+        "Gesture recognition",
+        "Stabilization systems",
+        "Robotics"
+      ],
+      
+      "datasheet_url": "https://invensense.tdk.com/wp-content/uploads/2015/02/MPU-6050-Datasheet1.pdf"
+    }
+  ],
+  
+  "passive_components": {
+    "resistors": {
+      "default_footprint": "Resistor_SMD:R_0805",
+      "common_values": ["100", "220", "330", "470", "1k", "4.7k", "10k", "100k"],
+      "default_power": "0.125W"
+    },
+    "capacitors": {
+      "default_footprint": "Capacitor_SMD:C_0805",
+      "common_values": ["10pF", "22pF", "100pF", "1nF", "10nF", "100nF", "1uF", "10uF"],
+      "default_voltage": "25V"
+    },
+    "leds": {
+      "default_footprint": "LED_SMD:LED_0805",
+      "common_colors": ["RED", "GREEN", "BLUE", "YELLOW", "WHITE"],
+      "default_current": "20mA"
+    }
+  },
+  
+  "design_rules": {
+    "mcu_decoupling": {
+      "description": "Every MCU VCC pin needs 100nF capacitor to GND",
+      "capacitor_value": "100nF",
+      "placement": "as_close_as_possible"
+    },
+    "i2c_pullups": {
+      "description": "I2C lines need pull-up resistors",
+      "resistor_value": "4.7k",
+      "alternative_values": ["2.2k", "10k"]
+    },
+    "reset_pullup": {
+      "description": "RESET pins typically need pull-up resistor",
+      "resistor_value": "10k"
+    },
+    "crystal_load_caps": {
+      "description": "Crystal oscillators need load capacitors",
+      "typical_value": "22pF",
+      "range": "12-33pF"
+    }
+  }
+}

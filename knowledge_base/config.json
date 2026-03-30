@@ -1,0 +1,48 @@
+{
+  "llm_providers": {
+    "google": {
+      "enabled": true,
+      "api_key": "AIzaSyAZg91akXZ8gslgzMpDLpHYrDNrrkjb_v4",
+      "model": "gemini-2.0-flash",
+      "endpoint": "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent",
+      "rate_limits": {
+        "requests_per_minute": 15,
+        "tokens_per_month": 1000000
+      },
+      "setup_instructions": "Get API key from https://aistudio.google.com/app/apikey"
+    },
+    "groq": {
+      "enabled": false,
+      "api_key": "",
+      "model": "llama-3.1-70b-versatile",
+      "endpoint": "https://api.groq.com/openai/v1/chat/completions",
+      "rate_limits": {
+        "requests_per_minute": 30,
+        "requests_per_day": 6000
+      },
+      "setup_instructions": "Get API key from https://console.groq.com/keys"
+    },
+    "ollama": {
+      "enabled": false,
+      "api_key": "",
+      "model": "llama3.2",
+      "endpoint": "http://localhost:11434/api/generate",
+      "rate_limits": {
+        "unlimited": true
+      },
+      "setup_instructions": "Install from https://ollama.ai and run: ollama pull llama3.2"
+    },
+    "puter": {
+      "enabled": true,
+      "api_key": "",
+      "model": "gemini-pro",
+      "endpoint": "https://api.puter.com/v1/completion",
+      "rate_limits": {
+        "unlimited": true
+      },
+      "setup_instructions": "No API key needed! Free unlimited access via Puter.js"
+    }
+  },
+  "default_provider": "google",
+  "fallback_provider": "puter"
+}
