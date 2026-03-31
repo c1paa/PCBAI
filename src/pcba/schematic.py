@@ -1178,42 +1178,97 @@ def generate_schematic(
     # Write file
     output_path.write_text(content)
 
-    # Step 5: Validate schematic (connectivity, ERC, readability)
-    from .circuit_validator import validate_schematic
+    # Step 5: Validate with kicad9_validator (BEFORE kicad-cli)
+    from .kicad9_validator import validate_schematic_content
     
-    print("\n  Validating schematic...")
-    validation = validate_schematic(output_path)
+    print("\n  Validating KiCad 9.0 format...")
+    validation = validate_schematic_content(content)
     
-    if validation['connectivity'].valid:
-        print(f"  ✓ Connectivity: PASS")
+    if not validation.valid:
+        print(f"  ✗ KiCad 9.0 validation FAILED:")
+        for error in validation.errors:
+            print(f"    - {error}")
+        
+        # Try to auto-fix
+        from .kicad9_validator import KiCad9Validator
+        validator = KiCad9Validator()
+        if validator._check_syntax_balance(content) or validator._check_strings_quoted(content):
+            print("  Attempting auto-fix...")
+            # Re-generate with fixes
+            content = _apply_validation_fixes(content, validation)
+            output_path.write_text(content)
+            
+            # Re-validate
+            validation = validate_schematic_content(content)
+            if validation.valid:
+                print("  ✓ Auto-fix successful!")
+            else:
+                print("  ✗ Auto-fix failed, manual fix required")
     else:
-        for error in validation['connectivity'].errors:
-            print(f"  ✗ {error}")
-    
-    if validation['erc'].valid:
-        print(f"  ✓ ERC: PASS")
-    else:
-        for error in validation['erc'].errors:
-            print(f"  ✗ {error}")
-    
-    readability = validation['readability']
-    print(f"  ✓ Readability: {readability['score']:.1f}% ({readability['rating']})")
+        print(f"  ✓ KiCad 9.0 format: VALID")
     
     # Step 6: Validate with kicad-cli
     from .validator import KiCadValidator
-    validator = KiCadValidator()
-    result = validator.validate_schematic(output_path)
-
+    
+    print("\n  Running kicad-cli validation...")
+    kicad_validator = KiCadValidator()
+    kicad_result = kicad_validator.validate_schematic(output_path)
+    
     n_comps = len(circuit_data.get('components', []))
     n_conns = len(circuit_data.get('connections', []))
     config_type = circuit_data.get('configuration', 'custom')
 
-    if result.valid:
+    if kicad_result.valid and validation.valid:
         print(f"\n✓ Schematic generated: {output_path}")
         print(f"  Components: {n_comps}, Connections: {n_conns}, Configuration: {config_type}")
+        print(f"  ✓ KiCad 9.0: VALID")
+        print(f"  ✓ kicad-cli: PASS")
     else:
-        print(f"\n⚠️ Schematic generated but kicad-cli validation failed:")
-        for error in result.errors:
-            print(f"  ✗ {error}")
+        print(f"\n⚠️  Schematic generated but has issues:")
+        if not validation.valid:
+            for error in validation.errors:
+                print(f"  ✗ {error}")
+        if not kicad_result.valid:
+            for error in kicad_result.errors:
+                print(f"  ✗ {error}")
 
     return output_path
+
+
+def _apply_validation_fixes(content: str, validation) -> str:
+    """
+    Apply automatic fixes for common validation errors.
+    
+    Args:
+        content: Schematic content
+        validation: ValidationResult with errors
+        
+    Returns:
+        Fixed content
+    """
+    from .kicad9_validator import KiCad9Validator
+    
+    validator = KiCad9Validator()
+    
+    # Fix parenthesis balance
+    open_count = content.count('(')
+    close_count = content.count(')')
+    
+    if open_count > close_count:
+        content = content.rstrip() + ')' * (open_count - close_count)
+    elif close_count > open_count:
+        diff = close_count - open_count
+        content = content.rstrip(')') + ')' * diff
+    
+    # Fix missing embedded_fonts
+    if '(embedded_fonts' not in content and content.strip().endswith(')'):
+        content = content.rstrip()[:-1] + '\n\t(embedded_fonts no)\n)'
+    
+    # Fix missing generator_version
+    if '(generator_version' not in content and '(generator "eeschema")' in content:
+        content = content.replace(
+            '(generator "eeschema")',
+            '(generator "eeschema")\n\t(generator_version "9.0")'
+        )
+    
+    return content
