@@ -135,7 +135,7 @@ class ProjectAIAssistant:
             for c in components
             if c["type"] == "capacitor" and c.get("value") in ["100nF", "0.1uF"]
         ]
-        return len(capacitors) > 0
+        return len(caps) > 0
 
     def _has_i2c_pullups(self, components: list[dict]) -> bool:
         """Check if I2C pull-up resistors exist."""
