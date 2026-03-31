@@ -206,6 +206,15 @@ class EnhancedCircuitAnalyzer:
                 'purpose': 'current limiting',
             })
 
+        # Add MCU if Arduino mentioned
+        if 'arduino' in desc:
+            components.append({
+                'type': 'mcu',
+                'name': 'Arduino Uno',
+                'value': 'Arduino Uno',
+                'quantity': 1,
+            })
+
         # Extract standalone value patterns like "330 ohm"
         for comp in components:
             if comp['type'] == 'resistor' and comp['value'] == '10k':
