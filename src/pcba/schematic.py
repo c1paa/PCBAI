@@ -1519,8 +1519,8 @@ class SchematicGenerator:
         if 'arduino' in name_lower:
             return kicad_db.get('arduino', {}).get('lib_id', 'MCU_Module:Arduino_UNO_R3')
         elif 'atmega' in name_lower:
-            # Fallback to ATmega if explicitly requested
-            return 'MCU_Microchip_ATmega:ATmega328P-AU'
+            # Fallback to Arduino UNO R3 since ATmega328P-AU doesn't exist
+            return 'MCU_Module:Arduino_UNO_R3'
         elif 'esp32' in name_lower:
             return kicad_db.get('esp32_wroom', {}).get('lib_id', 'PCM_Espressif:ESP32-WROOM-32E')
         elif 'dht' in name_lower:
