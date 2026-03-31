@@ -120,16 +120,27 @@
 
 ---
 
-## PHASE 3: AI Training (QWEN CODE - LOW PRIORITY)
+## PHASE 3: AI Training (QWEN CODE - IN PROGRESS)
 
 ### Task 3.1: Dataset Collection
-- [ ] **Status:** PENDING (QWEN'S TASK)
+- [x] **Status:** DONE (Initial collection)
+- [x] **File:** `scripts/collect_dataset.py`
+- [x] **Implementation:**
+  - Parses `.kicad_sch` files into structured JSON
+  - Skips lib_symbols section (library definitions)
+  - Extracts components, wires, nets
+  - Creates training pairs (description → schematic)
+- [x] **Dataset:** `datasets/schematic_generation.json` (27 pairs)
+- [ ] **Next:** Scrape GitHub for more examples (target: 1000+)
 
 ### Task 3.2: Model Selection
-- [ ] **Status:** PENDING (QWEN'S TASK)
+- [ ] **Status:** PENDING
 
 ### Task 3.3: Training Pipeline
-- [ ] **Status:** PENDING (QWEN'S TASK)
+- [ ] **Status:** PENDING
+
+### Task 3.4: Model Integration
+- [ ] **Status:** PENDING
 
 ---
 
