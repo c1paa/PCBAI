@@ -343,8 +343,21 @@ class EnhancedCircuitAnalyzer:
         return expanded
 
     def _assign_references(self, components: list[dict]) -> None:
-        """Assign unique reference designators (R1, R2, LED1, LED2, etc.)."""
+        """Assign unique reference designators with correct prefixes."""
         counters: dict[str, int] = {}
+        
+        # Correct KiCad reference prefixes
+        REF_PREFIX = {
+            'resistor': 'R',
+            'capacitor': 'C', 
+            'led': 'D',
+            'diode': 'D',
+            'arduino': 'A',  # Arduino boards use 'A'
+            'mcu': 'A',      # MCU boards use 'A'
+            'sensor': 'U',
+            'connector': 'J',
+        }
+        
         for comp in components:
             comp_type = comp.get('type', 'unknown')
             prefix = REF_PREFIX.get(comp_type, 'U')

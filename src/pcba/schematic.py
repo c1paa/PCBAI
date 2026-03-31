@@ -1171,9 +1171,9 @@ def generate_schematic(
             mcu_pin=circuit_data.get('mcu_pin'),
         )
 
-    # Step 4: Generate KiCad schematic
-    generator = SchematicGenerator(components_db)
-    content = generator.generate(circuit_data)
+    # Step 4: Generate KiCad schematic with PROPER pin connections
+    from .proper_schematic_generator import generate_proper_schematic
+    content = generate_proper_schematic(circuit_data)
 
     # Write file
     output_path.write_text(content)
