@@ -1,0 +1,192 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created_by": "PCBAI Dataset Collector",
+    "total_pairs": 4
+  },
+  "training_pairs": [
+    {
+      "input": "KiCad schematic: gen3",
+      "output": {
+        "components": [
+          {
+            "ref": "U2",
+            "lib_id": "Device:GenericSensor",
+            "type": "other",
+            "value": "None"
+          }
+        ],
+        "wires": [],
+        "nets": [],
+        "component_count": 1,
+        "wire_count": 0
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/gen3.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: gen2",
+      "output": {
+        "components": [
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "None"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "None"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 200.0,
+            "y1": 56.19,
+            "x2": 203.81,
+            "y2": 100.0
+          },
+          {
+            "x1": 200.0,
+            "y1": 56.19,
+            "x2": 203.81,
+            "y2": 140.0
+          }
+        ],
+        "nets": [],
+        "component_count": 5,
+        "wire_count": 2
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/gen2.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: gen4",
+      "output": {
+        "components": [
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "A1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "Arduino Uno"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "Device:GenericSensor",
+            "type": "other",
+            "value": "None"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 162.7,
+            "y1": 105.08,
+            "x2": 200.0,
+            "y2": 63.81
+          },
+          {
+            "x1": 200.0,
+            "y1": 56.19,
+            "x2": 203.81,
+            "y2": 140.0
+          },
+          {
+            "x1": 196.19,
+            "y1": 140.0,
+            "x2": 137.3,
+            "y2": 105.08
+          }
+        ],
+        "nets": [],
+        "component_count": 7,
+        "wire_count": 3
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/gen4.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: gen1",
+      "output": {
+        "components": [
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "A1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "Arduino UNO R3"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 200.0,
+            "y1": 56.19,
+            "x2": 203.81,
+            "y2": 100.0
+          }
+        ],
+        "nets": [],
+        "component_count": 3,
+        "wire_count": 1
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/gen1.kicad_sch"
+    }
+  ]
+}
