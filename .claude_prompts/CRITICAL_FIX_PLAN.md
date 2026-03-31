@@ -2,6 +2,32 @@
 
 ## ⚠️ CRITICAL PROBLEMS (MUST FIX IMMEDIATELY)
 
+### Problem 0: Incorrect Symbol Generation (MOST CRITICAL)
+**Current behavior:** Symbols are generated as text templates in Python code, not loaded from official KiCad libraries.
+
+**Expected:** Symbols MUST be loaded from `.kicad_sym` library files using proper KiCad format.
+
+**Why this matters:**
+- Hand-written symbols may have incorrect pin names/positions
+- Missing required properties (footprint filters, keywords)
+- Not compatible with KiCad's symbol linking system
+- Cannot use official KiCad footprints
+
+**Solution:** Use `KiCadLibraryReader` to load symbols from:
+```
+/Applications/KiCad/KiCad.app/Contents/SharedSupport/symbols/
+  - Device.kicad_sym (R, C, LED, etc.)
+  - MCU_Module.kicad_sym (Arduino boards)
+  - power.kicad_sym (GND, VCC, etc.)
+```
+
+**Reference:**
+- KiCad Symbol Format: https://dev-docs.kicad.org/en/file-formats/sexpr-schematic/
+- Symbol Libraries: https://gitlab.com/kicad/libraries/kicad-symbols
+- `.kicad_sym` file format uses S-expressions with specific structure
+
+---
+
 ### Problem 1: Duplicate MCU Components
 **Current behavior:** Query "Arduino with two LED" creates BOTH ATmega328P chip AND Arduino UNO board, overlaid on top of each other with all pins connected together.
 
@@ -43,6 +69,64 @@ Build an AI-powered PCB design assistant that:
 ## 📋 IMPLEMENTATION PLAN (PRIORITY ORDER)
 
 ### PHASE 1: Fix Critical Bugs (DO THIS NOW - HIGH PRIORITY)
+
+#### Task 1.0: Use Official KiCad Symbol Libraries (MOST CRITICAL)
+**File:** `src/pcba/schematic_generator.py` or wherever symbols are generated
+
+**Problem:** Symbols are hand-written as Python strings, not loaded from `.kicad_sym` files.
+
+**Current (WRONG):**
+```python
+def _symbol_resistor(self) -> str:
+    return '''(symbol "Device:R"
+  (pin_numbers (hide yes))
+  ...
+)'''  # Hand-written template
+```
+
+**Expected (CORRECT):**
+```python
+from .kicad_library import KiCadLibraryReader
+
+reader = KiCadLibraryReader()
+symbol_text = reader.load_symbol('Device:R')
+# Returns ACTUAL symbol from Device.kicad_sym file
+```
+
+**Implementation:**
+1. Check if `KiCadLibraryReader` exists (already created in runtime_verifier.py)
+2. Use it to load ALL symbols from libraries:
+   ```python
+   # In schematic generator
+   def generate_lib_symbols(self, components: list) -> list[str]:
+       reader = KiCadLibraryReader()
+       symbols = []
+       
+       for comp in components:
+           lib_id = comp.get('lib_id')
+           symbol = reader.load_symbol(lib_id)
+           if symbol:
+               symbols.append(symbol)
+           else:
+               print(f"⚠️ Symbol {lib_id} not found in libraries")
+       
+       return symbols
+   ```
+
+**Validation:**
+```bash
+# Check symbol comes from library
+pcba schematic "Resistor" -o test.kicad_sch
+grep -A 50 "lib_symbols" test.kicad_sch
+# Should show full symbol definition from Device.kicad_sym
+# NOT a Python template
+```
+
+**References:**
+- https://dev-docs.kicad.org/en/file-formats/sexpr-schematic/#_symbol_section
+- https://gitlab.com/kicad/libraries/kicad-symbols/-/blob/master/Device.kicad_sym
+
+---
 
 #### Task 1.1: Prevent Duplicate MCU
 **File:** `src/pcba/ai_analyzer.py`
