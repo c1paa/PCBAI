@@ -13,6 +13,8 @@ import urllib.error
 from pathlib import Path
 from typing import Any
 
+from .kicad_library import KiCadLibraryReader
+
 
 # ============================================================================
 # Configuration
@@ -42,8 +44,20 @@ KICAD_COMPONENTS = {
         "footprint_smd": "LED_SMD:LED_0805_2012Metric",
         "footprint_tht": "LED_THT:LED_D5.0mm"
     },
+    "arduino": {
+        "lib_id": "MCU_Module:Arduino_UNO_R3",
+        "footprint": "Module:Arduino_UNO_R3",
+        "pins": {
+            "VIN": "1", "GND": "4", "5V": "5", "3V3": "6",
+            "D0": "15", "D1": "16", "D2": "17", "D3": "18",
+            "D4": "19", "D5": "20", "D6": "21", "D7": "22",
+            "D8": "23", "D9": "24", "D10": "25", "D11": "26",
+            "D12": "27", "D13": "28",
+            "A0": "9", "A1": "10", "A2": "11", "A3": "12", "A4": "13", "A5": "14",
+        }
+    },
     "atmega328p": {
-        "lib_id": "MCU_Microchip_ATmega:ATMEGA328P-A",
+        "lib_id": "MCU_Microchip_ATmega:ATmega328P-AU",
         "footprint": "Package_QFP:TQFP-32_7x7mm_P0.8mm",
         "pins": {
             "VCC": ["19", "30"],
@@ -414,10 +428,14 @@ class SchematicGenerator:
         """Generate complete .kicad_sch content."""
         components = circuit_data.get('components', [])
         power = circuit_data.get('power', {'positive': '+5V', 'ground': 'GND'})
-        
+        connections = circuit_data.get('connections', [])
+
         # Get component details from database
         enriched_components = self._enrich_components(components)
-        
+
+        # Calculate positions for all components
+        positions = self._calculate_positions(enriched_components)
+
         # Generate content
         lines = []
         lines.append('(kicad_sch')
@@ -426,19 +444,23 @@ class SchematicGenerator:
         lines.append('\t(generator_version "9.0")')
         lines.append(f'\t(uuid "{self.project_uuid}")')
         lines.append('\t(paper "A4")')
-        
+
         # Library symbols
         lines.append('\t(lib_symbols')
         lines.extend(self._generate_lib_symbols(enriched_components))
         lines.append('\t)')
-        
-        # Component instances
+
+        # Component instances with positions
         for comp in enriched_components:
-            lines.append(self._generate_component_instance(comp))
-        
+            lines.append(self._generate_component_instance(comp, positions))
+
+        # Wires (connections)
+        if connections:
+            lines.extend(self._generate_wires(connections, positions))
+
         # Power flags
         lines.extend(self._generate_power_flags(power))
-        
+
         # Sheet instances
         lines.append('\t(sheet_instances')
         lines.append('\t\t(path "/"')
@@ -447,8 +469,81 @@ class SchematicGenerator:
         lines.append('\t)')
         lines.append('\t(embedded_fonts no)')
         lines.append(')')
-        
+
         return '\n'.join(lines)
+
+    def _calculate_positions(self, components: list[dict]) -> dict[str, tuple[float, float, int]]:
+        """Calculate positions for all components.
+        
+        Layout: left-to-right with MCU in center.
+        Returns: dict[ref, (x, y, rotation)]
+        """
+        positions = {}
+        
+        # Find MCU (if any)
+        mcus = [c for c in components if 'mcu' in c.get('type', '') or 
+                'arduino' in c.get('name', '').lower() or
+                'atmega' in c.get('name', '').lower()]
+        
+        # Find other components
+        others = [c for c in components if c not in mcus]
+        
+        # Place MCU in center
+        mcu_x, mcu_y = 150, 100
+        for mcu in mcus:
+            positions[mcu['ref']] = (mcu_x, mcu_y, 0)
+        
+        # Place other components left-to-right
+        start_x = 80
+        y_level = 90
+        spacing_x = 40
+        
+        for i, comp in enumerate(others):
+            x = start_x + (i * spacing_x)
+            rotation = 90 if 'resistor' in comp.get('type', '') else 0
+            positions[comp['ref']] = (x, y_level, rotation)
+        
+        return positions
+
+    def _generate_wires(self, connections: list[dict], positions: dict[str, tuple[float, float, int]]) -> list[str]:
+        """Generate wire statements for all connections."""
+        wires = []
+        
+        for conn in connections:
+            from_ref = conn.get('from', '')
+            to_ref = conn.get('to', '')
+            
+            if not from_ref or not to_ref:
+                continue
+            
+            # Parse from/to (e.g., "Arduino:Pin5" or "R1:1")
+            from_parts = from_ref.split(':')
+            to_parts = to_ref.split(':')
+            
+            # Get component positions
+            from_comp_ref = from_parts[0]
+            to_comp_ref = to_parts[0]
+            
+            from_pos = positions.get(from_comp_ref, (0, 0, 0))
+            to_pos = positions.get(to_comp_ref, (0, 0, 0))
+            
+            # For now, use simple straight lines between component centers
+            # In future: calculate actual pin positions
+            x1, y1, _ = from_pos
+            x2, y2, _ = to_pos
+            
+            # Generate wire
+            wire_uuid = str(uuid.uuid4())
+            wires.append(f'''	(wire
+		(pts (xy {x1} {y1}) (xy {x2} {y2}))
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "{wire_uuid}")
+	)''')
+        
+        return wires
     
     def _enrich_components(self, components: list[dict]) -> list[dict]:
         """Add detailed info from database to components."""
@@ -482,58 +577,64 @@ class SchematicGenerator:
         return None
     
     def _generate_lib_symbols(self, components: list[dict]) -> list[str]:
-        """Generate library symbols section."""
+        """Generate library symbols section using official KiCad libraries."""
+        from .kicad_library import KiCadLibraryReader
+        
+        reader = KiCadLibraryReader()
         symbols = []
-        used_symbols = set()
-
-        # Symbol templates
-        symbol_templates = {
-            'resistor': self._symbol_resistor(),
-            'led': self._symbol_led(),
-            'capacitor': self._symbol_capacitor(),
-            'mcu': self._symbol_generic_ic(),
-            'sensor': self._symbol_generic_sensor(),
-        }
+        used_lib_ids = set()
 
         for comp in components:
-            category = comp.get('category', 'sensor')
-            comp_type = comp.get('type', '')
-            name = comp.get('name', '').lower()
-            lib_id = comp.get('lib_id', '')
+            comp_type = comp.get('type', comp.get('category', 'sensor'))
+            name = comp.get('name', '')
+            value = comp.get('value', '')
+            lib_id = self._get_lib_id_for_component(comp_type, name, value)
 
-            # Determine which symbol to use based on multiple factors
-            symbol_to_add = None
-            
-            # Check by lib_id first (most reliable)
-            if 'R' in lib_id or 'resistor' in comp_type or 'resistor' in name:
-                symbol_to_add = 'resistor'
-            elif 'LED' in lib_id or 'led' in comp_type or 'led' in name:
-                symbol_to_add = 'led'
-            elif 'C' in lib_id or 'capacitor' in comp_type or 'capacitor' in name:
-                symbol_to_add = 'capacitor'
-            elif 'ATmega' in name or 'ESP32' in name or 'arduino' in name:
-                symbol_to_add = 'mcu'
-            elif category == 'resistor':
-                symbol_to_add = 'resistor'
-            elif category == 'led':
-                symbol_to_add = 'led'
-            elif category == 'capacitor':
-                symbol_to_add = 'capacitor'
-            elif category == 'mcu':
-                symbol_to_add = 'mcu'
+            if lib_id in used_lib_ids:
+                continue
+            used_lib_ids.add(lib_id)
+
+            # Try official library first
+            symbol_text = reader.load_symbol(lib_id)
+            if symbol_text:
+                symbols.append(symbol_text)
             else:
-                symbol_to_add = 'sensor'  # Default
-            
-            # Add symbol if not already added
-            if symbol_to_add and symbol_to_add not in used_symbols:
-                template = symbol_templates.get(symbol_to_add)
+                # Fallback to hardcoded templates
+                symbol_templates = {
+                    'resistor': self._symbol_resistor(),
+                    'led': self._symbol_led(),
+                    'capacitor': self._symbol_capacitor(),
+                    'mcu': self._symbol_generic_ic(),
+                    'sensor': self._symbol_generic_sensor(),
+                }
+                # determine template key
+                if 'resistor' in comp_type or 'R' == lib_id.split(':')[-1]:
+                    key = 'resistor'
+                elif 'led' in comp_type:
+                    key = 'led'
+                elif 'capacitor' in comp_type:
+                    key = 'capacitor'
+                elif 'mcu' in comp_type or 'arduino' in name.lower() or 'atmega' in name.lower():
+                    key = 'mcu'
+                else:
+                    key = 'sensor'
+                template = symbol_templates.get(key)
                 if template:
                     symbols.append(template)
-                    used_symbols.add(symbol_to_add)
 
-        # Always add power symbols
-        symbols.append(self._symbol_power_5v())
-        symbols.append(self._symbol_gnd())
+        # Always add power symbols from library
+        for power_id in ['power:+5V', 'power:GND']:
+            if power_id not in used_lib_ids:
+                sym = reader.load_symbol(power_id)
+                if sym:
+                    symbols.append(sym)
+                else:
+                    # fallback
+                    if '+5V' in power_id:
+                        symbols.append(self._symbol_power_5v())
+                    else:
+                        symbols.append(self._symbol_gnd())
+                used_lib_ids.add(power_id)
 
         return symbols
     
@@ -1332,7 +1433,7 @@ class SchematicGenerator:
 			(embedded_fonts no)
 		)'''
     
-    def _generate_component_instance(self, comp: dict) -> str:
+    def _generate_component_instance(self, comp: dict, positions: dict[str, tuple[float, float, int]] | None = None) -> str:
         """Generate symbol instance for a component."""
         ref = comp.get('ref', 'U1')
         comp_type = comp.get('type', comp.get('category', 'sensor'))
@@ -1346,23 +1447,21 @@ class SchematicGenerator:
         # Generate UUIDs
         comp_uuid = str(uuid.uuid4())
 
-        # Position components in center of sheet with proper orientation
-        # Center is around (150, 100) for A4 paper
-        if 'resistor' in comp_type or comp_type == 'r' or 'R' in lib_id:
-            # Resistor: horizontal, center-left
-            x, y, rotation = 120, 90, 90
-        elif 'led' in comp_type or comp_type == 'd' or 'LED' in lib_id:
-            # LED: horizontal, center-right
-            x, y, rotation = 180, 90, 0
-        elif 'atmega' in name.lower() or 'arduino' in name.lower():
-            # MCU: center of sheet
-            x, y, rotation = 150, 100, 0
-        elif 'capacitor' in comp_type or comp_type == 'c':
-            # Capacitor: vertical
-            x, y, rotation = 140, 80, 0
+        # Use provided positions or calculate default
+        if positions and ref in positions:
+            x, y, rotation = positions[ref]
         else:
-            # Default: center area
-            x, y, rotation = 150, 100, 0
+            # Fallback to old logic
+            if 'resistor' in comp_type or comp_type == 'r' or 'R' in lib_id:
+                x, y, rotation = 120, 90, 90
+            elif 'led' in comp_type or comp_type == 'd' or 'LED' in lib_id:
+                x, y, rotation = 180, 90, 0
+            elif 'atmega' in name.lower() or 'arduino' in name.lower():
+                x, y, rotation = 150, 100, 0
+            elif 'capacitor' in comp_type or comp_type == 'c':
+                x, y, rotation = 140, 80, 0
+            else:
+                x, y, rotation = 150, 100, 0
 
         return f'''	(symbol
 		(lib_id "{lib_id}")
@@ -1427,10 +1526,12 @@ class SchematicGenerator:
         if comp_type in kicad_db:
             return kicad_db[comp_type].get('lib_id', f"Device:{comp_type.upper()}")
 
-        # Match by name
+        # Match by name - check arduino FIRST before atmega
         name_lower = name.lower()
-        if 'atmega' in name_lower or 'arduino' in name_lower:
-            return kicad_db.get('atmega328p', {}).get('lib_id', 'MCU_Microchip_ATmega:ATMEGA328P-A')
+        if 'arduino' in name_lower:
+            return kicad_db.get('arduino', {}).get('lib_id', 'MCU_Module:Arduino_UNO_R3')
+        elif 'atmega' in name_lower:
+            return kicad_db.get('atmega328p', {}).get('lib_id', 'MCU_Microchip_ATmega:ATmega328P-AU')
         elif 'esp32' in name_lower:
             return kicad_db.get('esp32_wroom', {}).get('lib_id', 'PCM_Espressif:ESP32-WROOM-32E')
         elif 'dht' in name_lower:
