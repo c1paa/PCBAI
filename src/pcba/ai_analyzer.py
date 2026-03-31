@@ -226,6 +226,18 @@ class EnhancedCircuitAnalyzer:
                 if val_match:
                     raw = val_match.group(0)
                     comp['value'] = raw.replace(' ', '').replace('ohm', '').replace('Ω', '')
+            
+            # Add lib_id if missing
+            if 'lib_id' not in comp:
+                comp_type = comp.get('type', 'unknown')
+                if comp_type == 'resistor':
+                    comp['lib_id'] = 'Device:R'
+                elif comp_type == 'led':
+                    comp['lib_id'] = 'Device:LED'
+                elif comp_type == 'capacitor':
+                    comp['lib_id'] = 'Device:C'
+                elif comp_type == 'arduino':
+                    comp['lib_id'] = 'MCU_Module:Arduino_UNO_R3'
 
         questions: list[str] = []
         if any(c['type'] == 'led' and c['quantity'] > 1 for c in components):
