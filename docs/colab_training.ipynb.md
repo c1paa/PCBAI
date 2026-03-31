@@ -43,6 +43,20 @@ try:
 except FileNotFoundError:
     all_pairs = dataset.get('training_pairs', [])
     print(f"No expanded dataset, using {len(all_pairs)} pairs")
+
+# Load large dataset (if exists)
+try:
+    with open('datasets/large_dataset.json', 'r') as f:
+        large = json.load(f)
+    
+    large_pairs = large.get('training_pairs', [])
+    print(f"Large dataset: {len(large_pairs)} pairs")
+    
+    # Combine all
+    all_pairs = all_pairs + large_pairs
+    print(f"TOTAL pairs: {len(all_pairs)}")
+except FileNotFoundError:
+    print("No large dataset yet")
 ```
 
 ## Prepare Data
@@ -161,26 +175,41 @@ for key, value in eval_results.items():
 ```python
 def generate_schematic(model_path, description):
     from transformers import T5ForConditionalGeneration, T5Tokenizer
-    
+
     model = T5ForConditionalGeneration.from_pretrained(model_path)
     tokenizer = T5Tokenizer.from_pretrained(model_path)
-    
+
     input_text = f"generate schematic: {description}"
     input_enc = tokenizer(input_text, return_tensors='pt')
-    
+
     output_ids = model.generate(
         input_enc['input_ids'],
         max_length=512,
         num_beams=4,
-        early_stopping=True
+        early_stopping=True,
+        no_repeat_ngram_size=2,
     )
-    
+
     output_text = tokenizer.decode(output_ids[0], skip_special_tokens=True)
-    return json.loads(output_text)
+    print(f"Raw output: {output_text}")
+    
+    # Try to parse JSON
+    try:
+        components = json.loads(output_text)
+        return components
+    except json.JSONDecodeError as e:
+        print(f"JSON parse error: {e}")
+        print("Model output was not valid JSON - needs more training")
+        return None
 
 # Test
+print("Testing model...")
 result = generate_schematic('./models/t5-schematic', 'Arduino with LED')
-print(json.dumps(result, indent=2))
+if result:
+    print(json.dumps(result, indent=2))
+else:
+    print("\nModel needs more training data or epochs")
+    print("With only 27 pairs, try 30+ epochs for better results")
 ```
 
 ## Upload to HuggingFace (Optional)
