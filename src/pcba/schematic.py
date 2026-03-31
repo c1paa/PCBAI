@@ -529,8 +529,15 @@ class SchematicGenerator:
         return symbols
     
     def _symbol_resistor(self) -> str:
-        """Resistor symbol - KiCad 9.0 format."""
+        """Resistor symbol - KiCad 9.0 format (matching test1.kicad_sch)."""
         return r'''		(symbol "Device:R"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 0)
+			)
+			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "R"
@@ -649,8 +656,16 @@ class SchematicGenerator:
 		)'''
     
     def _symbol_led(self) -> str:
-        """LED symbol - KiCad 9.0 format."""
+        """LED symbol - KiCad 9.0 format (matching test1.kicad_sch)."""
         return r'''		(symbol "Device:LED"
+			(pin_numbers
+				(hide yes)
+			)
+			(pin_names
+				(offset 1.016)
+				(hide yes)
+			)
+			(exclude_from_sim no)
 			(in_bom yes)
 			(on_board yes)
 			(property "Reference" "D"
@@ -1314,22 +1329,35 @@ class SchematicGenerator:
         comp_type = comp.get('type', comp.get('category', 'sensor'))
         name = comp.get('name', ref)
         value = comp.get('value', comp.get('name', '?'))
-        
+
         # Get correct lib_id from KiCad database
         lib_id = self._get_lib_id_for_component(comp_type, name, value)
         footprint = comp.get('footprint', '')
-        
+
         # Generate UUIDs
         comp_uuid = str(uuid.uuid4())
-        
-        # Position (simple grid)
-        idx = hash(ref) % 10
-        x = 100 + (idx * 25)
-        y = 80 + (hash(name) % 5 * 25)
-        
+
+        # Position components in center of sheet with proper orientation
+        # Center is around (150, 100) for A4 paper
+        if 'resistor' in comp_type or comp_type == 'r' or 'R' in lib_id:
+            # Resistor: horizontal, center-left
+            x, y, rotation = 120, 90, 90
+        elif 'led' in comp_type or comp_type == 'd' or 'LED' in lib_id:
+            # LED: horizontal, center-right
+            x, y, rotation = 180, 90, 0
+        elif 'atmega' in name.lower() or 'arduino' in name.lower():
+            # MCU: center of sheet
+            x, y, rotation = 150, 100, 0
+        elif 'capacitor' in comp_type or comp_type == 'c':
+            # Capacitor: vertical
+            x, y, rotation = 140, 80, 0
+        else:
+            # Default: center area
+            x, y, rotation = 150, 100, 0
+
         return f'''	(symbol
 		(lib_id "{lib_id}")
-		(at {x} {y} 0)
+		(at {x} {y} {rotation})
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -1354,7 +1382,7 @@ class SchematicGenerator:
 			)
 		)
 		(property "Footprint" "{footprint}"
-			(at {x} {y} 0)
+			(at {x} {y} {rotation})
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -1363,7 +1391,7 @@ class SchematicGenerator:
 			)
 		)
 		(property "Datasheet" "~"
-			(at {x} {y} 0)
+			(at {x} {y} {rotation})
 			(effects
 				(font
 					(size 1.27 1.27)
