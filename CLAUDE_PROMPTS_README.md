@@ -10,25 +10,37 @@
 **Purpose:** Fix all critical bugs in current implementation
 
 **What it contains:**
+- **Task 1.0:** Use official KiCad symbol libraries (MOST CRITICAL)
+  - Load from `.kicad_sym` files
+  - NOT hand-written templates
 - Problem 1: Duplicate MCU (ATmega + Arduino overlaid)
 - Problem 2: Wires don't connect to pins
 - Problem 3: No ground symbol
 - Problem 4: No circuit validation
 
 **PHASE 1 Tasks (DO FIRST):**
-1. Fix duplicate MCU - 30 min
-2. Fix wire-to-pin connections - 1 hour
-3. Add ground symbol - 30 min
-4. Test all fixes - 30 min
+1. **Task 1.0:** Load symbols from KiCad libraries - 1 hour ⭐⭐⭐
+2. Task 1.1: Fix duplicate MCU - 30 min
+3. Task 1.2: Fix wire-to-pin connections - 1 hour
+4. Task 1.3: Add ground symbol - 30 min
+5. Task 1.4: Test all fixes - 30 min
 
 **Expected result:**
 ```bash
 pcba schematic "Arduino with two LED on pin 5" -o test.kicad_sch
+
+# Check symbols from libraries:
+grep -A 50 "lib_symbols" test.kicad_sch
+# Should show symbols from Device.kicad_sym, MCU_Module.kicad_sym
+
+# Check no duplicates:
+grep "lib_id" test.kicad_sch
+# Should show: MCU_Module:Arduino_UNO_R3 (ONLY ONCE)
+
+# Check connections:
 open test.kicad_sch
-# Should show:
-# - 1 Arduino UNO (not 2 MCUs)
-# - Wires connected to LED pins
-# - GND symbol present
+# Wires connect to LED pins, not centers
+# GND symbol present
 ```
 
 ---
