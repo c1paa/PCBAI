@@ -36,51 +36,51 @@ class DialogManager:
         print("\n" + "="*60)
         print("  PCBAI Interactive Schematic Designer")
         print("="*60)
-        print("\n👋 Привет! Я AI-помощник для проектирования схем.")
-        print("Опиши какую схему хочешь создать, например:")
-        print("  • 'Светодиод с резистором к 5V'")
-        print("  • 'ATmega328P с DHT22 и BMP280'")
-        print("  • 'ESP32 с OLED дисплеем'")
-        print("\nКоманды:")
-        print("  • 'exit' / 'quit' / 'выход' - выйти")
-        print("  • 'save <filename>' - сохранить схему")
-        print("  • 'show' - показать текущую схему")
-        print("  • 'help' - помощь")
+        print("\nWelcome! I'm your AI assistant for schematic design.")
+        print("\nDescribe the circuit you want to create, for example:")
+        print("  - 'LED with resistor to 5V'")
+        print("  - 'ATmega328P with DHT22 and BMP280'")
+        print("  - 'ESP32 with OLED display'")
+        print("\nCommands:")
+        print("  - 'exit' / 'quit' - Exit")
+        print("  - 'save <filename>' - Save schematic")
+        print("  - 'show' - Show current circuit")
+        print("  - 'help' - Show help")
         print("="*60 + "\n")
-        
+
         while True:
             try:
-                user_input = input("🔹 Вы: ").strip()
-                
+                user_input = input("You: ").strip()
+
                 if not user_input:
                     continue
-                
+
                 # Check for commands
                 if user_input.lower() in ['exit', 'quit', 'выход']:
-                    print("\n👋 До свидания!")
+                    print("\nGoodbye!")
                     break
-                
+
                 if user_input.lower() == 'help':
                     self._show_help()
                     continue
-                
+
                 if user_input.lower().startswith('save '):
                     filename = user_input.split(' ', 1)[1]
                     self._save_schematic(filename)
                     continue
-                
+
                 if user_input.lower() == 'show':
                     self._show_current_circuit()
                     continue
-                
+
                 # Process user input
                 self._process_input(user_input)
-                
+
             except KeyboardInterrupt:
-                print("\n\n👋 До свидания!")
+                print("\n\nGoodbye!")
                 break
             except Exception as e:
-                print(f"\n❌ Ошибка: {e}")
+                print(f"\nError: {e}")
     
     def _process_input(self, user_input: str) -> None:
         """Process user input and generate response."""
@@ -93,7 +93,7 @@ class DialogManager:
         # Build context-aware prompt
         prompt = self._build_prompt(user_input)
         
-        print("\n🤖 AI: ", end="", flush=True)
+        print("\nAI: ", end="", flush=True)
         
         try:
             # Get AI response
@@ -224,45 +224,45 @@ AI: Отлично! Схема:
     
     def _show_help(self) -> None:
         """Show help message."""
-        print("\n📖 Помощь:")
-        print("  Опиши схему которую хочешь создать")
-        print("  Я предложу компоненты и схему подключения")
-        print("\nПримеры запросов:")
-        print("  • 'Светодиод с резистором'")
-        print("  • 'ATmega328P с кнопкой'")
-        print("  • 'Датчик влажности DHT22'")
-        print("\nКоманды:")
-        print("  • save <filename.kicad_sch> - сохранить")
-        print("  • show - показать текущую схему")
-        print("  • help - эта справка")
-        print("  • exit - выйти\n")
-    
+        print("\nHelp:")
+        print("  Describe the circuit you want to create")
+        print("  I will suggest components and connections")
+        print("\nExample requests:")
+        print("  - 'LED with resistor'")
+        print("  - 'ATmega328P with button'")
+        print("  - 'DHT22 humidity sensor'")
+        print("\nCommands:")
+        print("  - save <filename.kicad_sch> - Save schematic")
+        print("  - show - Show current circuit")
+        print("  - help - This help")
+        print("  - exit - Exit\n")
+
     def _show_current_circuit(self) -> None:
         """Show current circuit."""
         if self.current_circuit:
-            print("\n📋 Текущая схема:")
+            print("\nCurrent circuit:")
             print(json.dumps(self.current_circuit, indent=2, ensure_ascii=False))
         else:
-            print("\n⚠️ Схема ещё не создана")
+            print("\nCircuit not yet created")
     
     def _save_schematic(self, filename: str) -> None:
         """Save current schematic to file."""
         if not self.current_circuit:
-            print("\n⚠️ Сначала создайте схему")
+            print("\nPlease create a circuit first")
             return
-        
+
         from pcba.schematic import SchematicGenerator
-        
+
         generator = SchematicGenerator(self.db)
         content = generator.generate(self.current_circuit)
-        
+
         output_path = Path(filename)
         if not output_path.suffix == '.kicad_sch':
             output_path = output_path.with_suffix('.kicad_sch')
-        
+
         output_path.write_text(content)
-        print(f"\n✅ Схема сохранена: {output_path}")
-        
+        print(f"\nSchematic saved: {output_path}")
+
         # Validate with kicad-cli if available
         self._validate_with_kicad(output_path)
     
