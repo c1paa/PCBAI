@@ -330,6 +330,10 @@ class EnhancedCircuitAnalyzer:
             prefix = REF_PREFIX.get(comp_type, 'U')
             counters[prefix] = counters.get(prefix, 0) + 1
             comp['ref'] = f"{prefix}{counters[prefix]}"
+            
+            # Assign default lib_id for MCU types
+            if comp_type == 'mcu' and 'lib_id' not in comp:
+                comp['lib_id'] = 'MCU_Module:Arduino_UNO_R3'
 
     def _assign_footprints(self, components: list[dict]) -> None:
         """Assign default footprints if not already set."""
