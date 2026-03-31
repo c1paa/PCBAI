@@ -171,14 +171,20 @@ def check():
               help='Ollama API URL')
 @click.option('--project-dir', type=click.Path(exists=True), default=None,
               help='KiCad project directory to analyze for context')
-def schematic(description: str, output: str, model: str, ollama_url: str, project_dir: Optional[str]):
+@click.option('--interactive', '-i', is_flag=True, default=False,
+              help='Enable interactive dialog for clarifying questions')
+def schematic(description: str, output: str, model: str, ollama_url: str, project_dir: Optional[str], interactive: bool):
     """Generate a KiCad schematic from a text description using LLM.
 
     DESCRIPTION: Natural language description of the circuit
 
+    Supports quantity extraction ("two LED" = 2 LEDs) and
+    connection type inference (series/parallel).
+
     Example:
         pcba schematic "LED with 330 ohm resistor" -o led.kicad_sch
-        pcba schematic "Buck converter 5V to 3.3V" --project-dir ./my_project
+        pcba schematic "two LED in series with 330 ohm resistor" -o leds.kicad_sch
+        pcba schematic "three LED in parallel to Arduino pin 5" -i
     """
     try:
         # Analyze project if provided
@@ -194,7 +200,8 @@ def schematic(description: str, output: str, model: str, ollama_url: str, projec
 
         result_path = generate_schematic(
             description, output, model, ollama_url,
-            learning_context=learning_context
+            learning_context=learning_context,
+            interactive=interactive,
         )
         click.echo(click.style(f'✓ Schematic generated: {result_path}', fg='green'))
     except Exception as e:

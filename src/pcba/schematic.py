@@ -332,56 +332,65 @@ Now analyze this circuit:
 
 
 class CircuitAnalyzer:
-    """Analyze circuit description using LLM."""
-    
+    """Analyze circuit description using LLM with enhanced quantity/connection support."""
+
     def __init__(self, llm_client: LLMClient, components_db: dict):
         self.client = llm_client
         self.db = components_db
-    
+        # Use enhanced analyzer for quantity extraction and connection inference
+        from .ai_analyzer import EnhancedCircuitAnalyzer
+        self._enhanced = EnhancedCircuitAnalyzer(llm_client)
+
     def analyze(self, description: str) -> dict[str, Any]:
-        """Analyze circuit description and return structured data."""
-        prompt = CIRCUIT_ANALYSIS_PROMPT + description
-        
+        """Analyze circuit description and return structured data.
+
+        Uses EnhancedCircuitAnalyzer for:
+        - Quantity extraction ("two LED" → 2 instances)
+        - Connection type inference (series/parallel)
+        - MCU pin extraction
+        - Automatic reference and footprint assignment
+        """
         print(f"Analyzing circuit: {description}")
-        response = self.client.generate(prompt)
-        
-        # Parse JSON
-        try:
-            json_match = re.search(r'\{.*\}', response, re.DOTALL)
-            if json_match:
-                return json.loads(json_match.group())
-            else:
-                return json.loads(response)
-        except json.JSONDecodeError as e:
-            print(f"Warning: Could not parse AI response: {e}")
-            return self._fallback_analysis(description)
-    
+
+        # Enhanced analysis with quantity expansion
+        analysis = self._enhanced.analyze(description)
+
+        # Merge with legacy analysis for MCU/sensor projects
+        if self._is_mcu_project(description):
+            legacy = self._fallback_analysis(description)
+            # Add any MCU/sensor components from legacy that enhanced missed
+            enhanced_types = {c.get('type') for c in analysis.get('components', [])}
+            for comp in legacy.get('components', []):
+                cat = comp.get('category', comp.get('type', ''))
+                if cat in ('mcu', 'sensor') and cat not in enhanced_types:
+                    analysis.setdefault('components', []).append(comp)
+
+        return analysis
+
+    def _is_mcu_project(self, description: str) -> bool:
+        desc = description.lower()
+        return any(kw in desc for kw in ('atmega', 'arduino', 'esp32', 'dht', 'bmp', 'mcu'))
+
     def _fallback_analysis(self, description: str) -> dict:
-        """Fallback analysis if LLM fails."""
+        """Fallback analysis for MCU/sensor projects."""
         desc_lower = description.lower()
-        
-        # Simple keyword-based analysis
         components = []
-        
+
         if 'atmega' in desc_lower or 'arduino' in desc_lower:
             components.append({"ref": "U1", "name": "ATmega328P", "category": "mcu", "quantity": 1})
-        
+
         if 'esp32' in desc_lower:
             components.append({"ref": "U1", "name": "ESP32", "category": "mcu", "quantity": 1})
-        
+
         if 'dht' in desc_lower:
             components.append({"ref": "D1", "name": "DHT22", "category": "sensor", "quantity": 1})
             components.append({"ref": "R1", "type": "resistor", "value": "10k", "purpose": "DHT pullup"})
-        
+
         if 'bmp' in desc_lower:
             components.append({"ref": "U2", "name": "BMP280", "category": "sensor", "quantity": 1})
-        
-        if 'led' in desc_lower:
-            components.append({"ref": "LED1", "type": "led", "value": "RED"})
-            components.append({"ref": "R2", "type": "resistor", "value": "330", "purpose": "LED current limit"})
-        
+
         return {
-            "circuit_type": "custom",
+            "circuit_type": "mcu_project",
             "description": description,
             "components": components,
             "connections": [],
@@ -1579,49 +1588,73 @@ def generate_schematic(
     model: str = "llama3.2",
     ollama_url: str = "http://localhost:11434",
     learning_context: dict | None = None,
+    interactive: bool = False,
 ) -> Path:
     """
     Generate a KiCad 9.0 schematic using AI.
-    
+
+    Enhanced pipeline:
+    1. AI analysis with quantity extraction ("two LED" → 2 LEDs)
+    2. Dialog for clarifying questions (series/parallel, color, etc.)
+    3. Connection generation based on circuit topology
+    4. KiCad schematic file generation
+
     Args:
-        description: Circuit description
-        output: Output file path
+        description: Circuit description in natural language
+        output: Output file path (.kicad_sch)
         model: Model name (not used yet)
         ollama_url: Ollama URL (not used yet)
         learning_context: Learning context (not used yet)
-    
+        interactive: If True, prompt user for clarifying questions
+
     Returns:
         Path to generated schematic
     """
+    from .circuit_generator import ConnectionGenerator
+    from .dialog_enhanced import DialogManager
+
     output_path = Path(output)
-    
+
     # Load configuration and database
     config = load_config()
     components_db = load_components()
-    
+
     # Initialize LLM client
     llm = LLMClient(config)
-    
-    # Analyze circuit
+
+    # Step 1: Analyze circuit with enhanced AI analyzer
     analyzer = CircuitAnalyzer(llm, components_db)
     circuit_data = analyzer.analyze(description)
-    
-    # Check if there are questions for the user
+
+    # Step 2: Handle clarifying questions via dialog manager
     questions = circuit_data.get('questions', [])
     if questions:
-        print("\n⚠️  AI has questions about the circuit:")
-        for i, q in enumerate(questions, 1):
-            print(f"  {i}. {q}")
-        print("\nContinuing with default assumptions...\n")
-    
-    # Generate schematic
+        dialog = DialogManager(interactive=interactive)
+        print("\n  AI needs clarification:")
+        answers = dialog.ask_questions(questions)
+        circuit_data = dialog.update_analysis(circuit_data, answers)
+
+    # Step 3: Generate connections if not already provided by LLM
+    if not circuit_data.get('connections'):
+        conn_gen = ConnectionGenerator()
+        circuit_data['connections'] = conn_gen.generate_connections(
+            components=circuit_data.get('components', []),
+            configuration=circuit_data.get('configuration', 'parallel'),
+            mcu_pin=circuit_data.get('mcu_pin'),
+        )
+
+    # Step 4: Generate KiCad schematic
     generator = SchematicGenerator(components_db)
     content = generator.generate(circuit_data)
-    
+
     # Write file
     output_path.write_text(content)
-    
+
+    n_comps = len(circuit_data.get('components', []))
+    n_conns = len(circuit_data.get('connections', []))
+    config_type = circuit_data.get('configuration', 'custom')
+
     print(f"✓ Schematic generated: {output_path}")
-    print(f"  Components: {len(circuit_data.get('components', []))}")
-    
+    print(f"  Components: {n_comps}, Connections: {n_conns}, Configuration: {config_type}")
+
     return output_path
