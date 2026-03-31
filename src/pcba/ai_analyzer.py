@@ -78,7 +78,7 @@ JSON FORMAT (strict, no markdown, no explanations):
   "circuit_type": "led_array|sensor_circuit|mcu_project|power_supply|custom",
   "components": [
     {
-      "type": "resistor|capacitor|led|diode|npn|pnp|inductor|mcu|sensor",
+      "type": "resistor|capacitor|led|diode|npn|pnp|inductor|mcu|arduino|sensor",
       "value": "330",
       "quantity": 2,
       "purpose": "current limiting"
@@ -96,7 +96,8 @@ EXAMPLE OUTPUT:
   "circuit_type": "led_array",
   "components": [
     {"type": "resistor", "value": "330", "quantity": 1, "purpose": "current limiting"},
-    {"type": "led", "value": "RED", "quantity": 2}
+    {"type": "led", "value": "RED", "quantity": 2},
+    {"type": "arduino", "value": "Arduino UNO R3", "quantity": 1}
   ],
   "configuration": "parallel",
   "mcu_pin": "5",
