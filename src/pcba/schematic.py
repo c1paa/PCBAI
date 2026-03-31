@@ -1358,11 +1358,11 @@ class SchematicGenerator:
         """Get correct KiCad lib_id for component type."""
         # Check component database
         kicad_db = self.db.get('kicad_components', {})
-        
+
         # Direct match by type
         if comp_type in kicad_db:
             return kicad_db[comp_type].get('lib_id', f"Device:{comp_type.upper()}")
-        
+
         # Match by name
         name_lower = name.lower()
         if 'atmega' in name_lower or 'arduino' in name_lower:
@@ -1384,6 +1384,130 @@ class SchematicGenerator:
         else:
             # Default to generic sensor
             return kicad_db.get('connector_2pin', {}).get('lib_id', 'Device:GenericSensor')
+
+    def _generate_custom_ic_symbol(self, name: str, pins: list[dict], size: float = 7.62) -> str:
+        """
+        Generate custom IC symbol with rectangular body and pins.
+        
+        Args:
+            name: Component name (e.g., "MySensor")
+            pins: List of pin dicts with {'num': '1', 'name': 'VCC', 'side': 'top'}
+            size: Half-size of rectangle (default 7.62mm = 15.24mm total)
+        
+        Returns:
+            KiCad 9.0 S-expression symbol definition
+        """
+        # Pin positions
+        pin_positions = {
+            'top': {'x': -5.08, 'y': size, 'rot': 270},
+            'bottom': {'x': -5.08, 'y': -size, 'rot': 90},
+            'left': {'x': -size, 'y': 5.08, 'rot': 0},
+            'right': {'x': size, 'y': 5.08, 'rot': 180},
+        }
+        
+        # Group pins by side
+        pins_by_side = {'top': [], 'bottom': [], 'left': [], 'right': []}
+        for pin in pins:
+            side = pin.get('side', 'left')
+            if side not in pins_by_side:
+                side = 'left'
+            pins_by_side[side].append(pin)
+        
+        # Generate pin definitions
+        pin_defs = []
+        y_offset = {'top': 0, 'bottom': 0, 'left': 5.08, 'right': 5.08}
+        
+        for side in ['left', 'right', 'top', 'bottom']:
+            side_pins = pins_by_side[side]
+            pos = pin_positions[side]
+            
+            for i, pin in enumerate(side_pins):
+                pin_num = pin.get('num', str(i+1))
+                pin_name = pin.get('name', f'Pin{pin_num}')
+                
+                if side in ['left', 'right']:
+                    y = pos['y'] - (i * 2.54)
+                    x = pos['x']
+                else:  # top/bottom
+                    x = pos['x'] + (i * 2.54)
+                    y = pos['y']
+                
+                pin_defs.append(f'''			(pin passive line
+				(at {x} {y} {pos['rot']})
+				(length 2.54)
+				(name "{pin_name}"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+				(number "{pin_num}"
+					(effects
+						(font
+							(size 1.27 1.27)
+						)
+					)
+				)
+			)''')
+        
+        pins_str = '\n'.join(pin_defs)
+        
+        return f'''		(symbol "Custom:{name}"
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "{name}"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "{name}_0_1"
+				(rectangle
+					(start {-size} {-size})
+					(end {size} {size})
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "{name}_1_1"
+{pins_str}
+			)
+			(embedded_fonts no)
+		)'''
     
     def _generate_power_flags(self, power: dict) -> list[str]:
         """Generate power flag symbols."""
