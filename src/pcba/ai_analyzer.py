@@ -210,7 +210,7 @@ class EnhancedCircuitAnalyzer:
         if 'arduino' in desc:
             # Use Arduino UNO R3 from MCU_Module library
             components.append({
-                'type': 'mcu',
+                'type': 'arduino',
                 'name': 'Arduino Uno',
                 'value': 'Arduino UNO R3',
                 'lib_id': 'MCU_Module:Arduino_UNO_R3',
