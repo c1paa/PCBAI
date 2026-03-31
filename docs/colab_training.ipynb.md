@@ -22,17 +22,27 @@ drive.mount('/content/drive')
 ```python
 import json
 
-# Load dataset
+# Load main dataset
 with open('datasets/schematic_generation.json', 'r') as f:
     dataset = json.load(f)
 
-print(f"Total training pairs: {len(dataset['training_pairs'])}")
+print(f"Main dataset: {len(dataset.get('training_pairs', []))} pairs")
 
-# If you have expanded dataset
-with open('datasets/expanded_dataset.json', 'r') as f:
-    expanded = json.load(f)
+# Load expanded dataset (if exists)
+try:
+    with open('datasets/expanded_dataset.json', 'r') as f:
+        expanded = json.load(f)
     
-print(f"Expanded dataset: {len(expanded['schematics'])} schematics")
+    # Handle both formats
+    expanded_pairs = expanded.get('training_pairs', expanded.get('schematics', []))
+    print(f"Expanded dataset: {len(expanded_pairs)} pairs")
+    
+    # Combine datasets
+    all_pairs = dataset.get('training_pairs', []) + expanded_pairs
+    print(f"Total pairs: {len(all_pairs)}")
+except FileNotFoundError:
+    all_pairs = dataset.get('training_pairs', [])
+    print(f"No expanded dataset, using {len(all_pairs)} pairs")
 ```
 
 ## Prepare Data
@@ -43,12 +53,10 @@ from transformers import T5Tokenizer
 import torch
 
 class SchematicDataset(Dataset):
-    def __init__(self, data_path, tokenizer, max_length=512):
-        with open(data_path, 'r') as f:
-            self.data = json.load(f)
+    def __init__(self, pairs, tokenizer, max_length=512):
+        self.pairs = pairs
         self.tokenizer = tokenizer
         self.max_length = max_length
-        self.pairs = self.data.get('training_pairs', [])
     
     def __len__(self):
         return len(self.pairs)
@@ -90,7 +98,7 @@ class SchematicDataset(Dataset):
 tokenizer = T5Tokenizer.from_pretrained('t5-small')
 
 # Load dataset
-dataset = SchematicDataset('datasets/schematic_generation.json', tokenizer)
+dataset = SchematicDataset(all_pairs, tokenizer)
 
 # Split
 train_size = int(0.8 * len(dataset))
