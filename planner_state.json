@@ -14,14 +14,15 @@
   "tasks": {
     "4.1": {
       "name": "Clean up project files",
-      "status": "in_progress",
+      "status": "done",
       "agent": "orchestrator",
       "priority": "critical",
-      "description": "Remove unused files, old prompts, redundant documentation"
+      "description": "Remove unused files, old prompts, redundant documentation",
+      "completed_at": "2026-03-31"
     },
     "4.2": {
       "name": "Verify proper_schematic_generator works",
-      "status": "pending",
+      "status": "in_progress",
       "agent": "debugger_functional",
       "priority": "critical",
       "description": "Ensure wires connect to actual pins, not centers"
@@ -49,7 +50,7 @@
     }
   },
 
-  "active_task": "4.1",
+  "active_task": "4.2",
 
   "known_issues": [
     {
