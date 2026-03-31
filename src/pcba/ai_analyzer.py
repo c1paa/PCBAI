@@ -253,17 +253,8 @@ class EnhancedCircuitAnalyzer:
                 'purpose': 'current limiting',
             })
 
-        # Add MCU if Arduino mentioned
-        if 'arduino' in desc:
-            # Use Arduino UNO R3 from MCU_Module library
-            components.append({
-                'type': 'arduino',
-                'name': 'Arduino Uno',
-                'value': 'Arduino UNO R3',
-                'lib_id': 'MCU_Module:Arduino_UNO_R3',
-                'footprint': 'Module:Arduino_UNO_R3',
-                'quantity': 1,
-            })
+        # DO NOT add Arduino here - LLM already returns it if needed
+        # Adding here causes duplicates
 
         # Extract standalone value patterns like "330 ohm"
         for comp in components:
