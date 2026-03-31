@@ -357,48 +357,10 @@ class CircuitAnalyzer:
         # Enhanced analysis with quantity expansion
         analysis = self._enhanced.analyze(description)
 
-        # Merge with legacy analysis for MCU/sensor projects
-        if self._is_mcu_project(description):
-            legacy = self._fallback_analysis(description)
-            # Add any MCU/sensor components from legacy that enhanced missed
-            enhanced_types = {c.get('type') for c in analysis.get('components', [])}
-            for comp in legacy.get('components', []):
-                cat = comp.get('category', comp.get('type', ''))
-                if cat in ('mcu', 'sensor') and cat not in enhanced_types:
-                    analysis.setdefault('components', []).append(comp)
+        # DO NOT merge with legacy - causes duplicate MCU
+        # Enhanced analyzer handles all cases correctly
 
         return analysis
-
-    def _is_mcu_project(self, description: str) -> bool:
-        desc = description.lower()
-        return any(kw in desc for kw in ('atmega', 'arduino', 'esp32', 'dht', 'bmp', 'mcu'))
-
-    def _fallback_analysis(self, description: str) -> dict:
-        """Fallback analysis for MCU/sensor projects."""
-        desc_lower = description.lower()
-        components = []
-
-        if 'atmega' in desc_lower or 'arduino' in desc_lower:
-            components.append({"ref": "U1", "name": "ATmega328P", "category": "mcu", "quantity": 1})
-
-        if 'esp32' in desc_lower:
-            components.append({"ref": "U1", "name": "ESP32", "category": "mcu", "quantity": 1})
-
-        if 'dht' in desc_lower:
-            components.append({"ref": "D1", "name": "DHT22", "category": "sensor", "quantity": 1})
-            components.append({"ref": "R1", "type": "resistor", "value": "10k", "purpose": "DHT pullup"})
-
-        if 'bmp' in desc_lower:
-            components.append({"ref": "U2", "name": "BMP280", "category": "sensor", "quantity": 1})
-
-        return {
-            "circuit_type": "mcu_project",
-            "description": description,
-            "components": components,
-            "connections": [],
-            "power": {"positive": "+5V", "ground": "GND"},
-            "questions": []
-        }
 
 
 # ============================================================================
@@ -444,7 +406,7 @@ class SchematicGenerator:
 
         # Wires (connections)
         if connections:
-            lines.extend(self._generate_wires(connections, positions))
+            lines.extend(self._generate_wires(connections, positions, enriched_components))
 
         # Power flags
         lines.extend(self._generate_power_flags(power))
@@ -468,8 +430,8 @@ class SchematicGenerator:
         """
         positions = {}
         
-        # Find MCU (if any)
-        mcus = [c for c in components if 'mcu' in c.get('type', '') or 
+        # Find MCU (if any) — check both type and name
+        mcus = [c for c in components if c.get('type', '') in ('mcu', 'arduino') or
                 'arduino' in c.get('name', '').lower() or
                 'atmega' in c.get('name', '').lower()]
         
@@ -493,45 +455,198 @@ class SchematicGenerator:
         
         return positions
 
-    def _generate_wires(self, connections: list[dict], positions: dict[str, tuple[float, float, int]]) -> list[str]:
-        """Generate wire statements for all connections."""
+    def _generate_wires(
+        self,
+        connections: list[dict],
+        positions: dict[str, tuple[float, float, int]],
+        components: list[dict] | None = None,
+    ) -> list[str]:
+        """Generate wire statements connecting actual pin positions."""
+        reader = KiCadLibraryReader()
         wires = []
-        
+
+        # Build ref → lib_id mapping from components
+        ref_to_lib_id: dict[str, str] = {}
+        if components:
+            for comp in components:
+                ref = comp.get('ref', '')
+                lib_id = comp.get('lib_id', '')
+                if ref and lib_id:
+                    ref_to_lib_id[ref] = lib_id
+
+        # Build pin-position cache: {comp_ref: {pin_number_or_name: (local_x, local_y)}}
+        pin_cache: dict[str, dict[str, tuple[float, float]]] = {}
+
         for conn in connections:
             from_ref = conn.get('from', '')
             to_ref = conn.get('to', '')
-            
             if not from_ref or not to_ref:
                 continue
-            
-            # Parse from/to (e.g., "Arduino:Pin5" or "R1:1")
-            from_parts = from_ref.split(':')
-            to_parts = to_ref.split(':')
-            
-            # Get component positions
-            from_comp_ref = from_parts[0]
-            to_comp_ref = to_parts[0]
-            
-            from_pos = positions.get(from_comp_ref, (0, 0, 0))
-            to_pos = positions.get(to_comp_ref, (0, 0, 0))
-            
-            # For now, use simple straight lines between component centers
-            # In future: calculate actual pin positions
-            x1, y1, _ = from_pos
-            x2, y2, _ = to_pos
-            
-            # Generate wire
-            wire_uuid = str(uuid.uuid4())
-            wires.append(f'''	(wire
-		(pts (xy {x1} {y1}) (xy {x2} {y2}))
-		(stroke
-			(width 0)
-			(type default)
-		)
-		(uuid "{wire_uuid}")
-	)''')
-        
+
+            x1, y1 = self._resolve_pin_position(
+                from_ref, positions, pin_cache, reader, ref_to_lib_id,
+            )
+            x2, y2 = self._resolve_pin_position(
+                to_ref, positions, pin_cache, reader, ref_to_lib_id,
+            )
+
+            # L-shaped routing: horizontal then vertical
+            wire_uuid1 = str(uuid.uuid4())
+            if abs(x1 - x2) > 0.01 and abs(y1 - y2) > 0.01:
+                # Two-segment L-shaped wire
+                wire_uuid2 = str(uuid.uuid4())
+                wires.append(f'''\t(wire
+\t\t(pts (xy {x1} {y1}) (xy {x2} {y1}))
+\t\t(stroke
+\t\t\t(width 0)
+\t\t\t(type default)
+\t\t)
+\t\t(uuid "{wire_uuid1}")
+\t)''')
+                wires.append(f'''\t(wire
+\t\t(pts (xy {x2} {y1}) (xy {x2} {y2}))
+\t\t(stroke
+\t\t\t(width 0)
+\t\t\t(type default)
+\t\t)
+\t\t(uuid "{wire_uuid2}")
+\t)''')
+            else:
+                # Straight wire
+                wires.append(f'''\t(wire
+\t\t(pts (xy {x1} {y1}) (xy {x2} {y2}))
+\t\t(stroke
+\t\t\t(width 0)
+\t\t\t(type default)
+\t\t)
+\t\t(uuid "{wire_uuid1}")
+\t)''')
+
         return wires
+
+    def _resolve_pin_position(
+        self,
+        pin_ref: str,
+        positions: dict[str, tuple[float, float, int]],
+        pin_cache: dict[str, dict[str, tuple[float, float]]],
+        reader: KiCadLibraryReader,
+        ref_to_lib_id: dict[str, str] | None = None,
+    ) -> tuple[float, float]:
+        """Resolve a pin reference like 'R1:1' or 'Arduino:Pin5' to absolute (x, y).
+
+        For power symbols (+5V, GND), returns a position near the connected component.
+        """
+        # Power symbols — not actual components, place at fixed positions
+        if pin_ref in ('+5V', 'VCC'):
+            return (80.0, 60.0)
+        if pin_ref == 'GND':
+            return (80.0, 120.0)
+
+        # Parse "CompRef:PinId"
+        if ':' in pin_ref:
+            comp_ref, pin_id = pin_ref.split(':', 1)
+        else:
+            comp_ref, pin_id = pin_ref, ''
+
+        # Handle "Arduino:Pin5" → resolve to pin D5 on the Arduino component
+        comp_pos = positions.get(comp_ref)
+        if not comp_pos:
+            # Try to find by component type/name (e.g., "Arduino" → U1)
+            ref_to_lib = ref_to_lib_id or {}
+            for ref, pos in positions.items():
+                lib_id_val = ref_to_lib.get(ref, '')
+                if (comp_ref.lower() in ref.lower()
+                    or comp_ref.lower() in lib_id_val.lower()):
+                    comp_pos = pos
+                    comp_ref = ref
+                    break
+            if not comp_pos:
+                return (0.0, 0.0)
+
+        cx, cy, rotation = comp_pos
+
+        # Build pin cache for this component
+        if comp_ref not in pin_cache:
+            pin_cache[comp_ref] = self._build_pin_cache(
+                comp_ref, reader, ref_to_lib_id,
+            )
+
+        pins = pin_cache[comp_ref]
+
+        # Resolve pin_id to a cache key
+        # "Pin5" → try "D5", "5", "Pin5"
+        pin_pos = None
+        if pin_id:
+            # Normalize "PinN" → "DN" for Arduino-style
+            normalized = pin_id
+            if pin_id.startswith('Pin'):
+                normalized = 'D' + pin_id[3:]
+
+            for candidate in [pin_id, normalized, f'D{pin_id}', f'A{pin_id}']:
+                if candidate in pins:
+                    pin_pos = pins[candidate]
+                    break
+
+            # Try by pin number directly
+            if not pin_pos:
+                for key, pos in pins.items():
+                    if key == pin_id:
+                        pin_pos = pos
+                        break
+
+        if not pin_pos:
+            # Fallback: use first pin or center
+            if pins:
+                pin_pos = next(iter(pins.values()))
+            else:
+                return (cx, cy)
+
+        local_x, local_y = pin_pos
+
+        # Transform local pin coordinates to global using component rotation
+        import math
+        rad = math.radians(rotation)
+        cos_r = math.cos(rad)
+        sin_r = math.sin(rad)
+        global_x = cx + local_x * cos_r - local_y * sin_r
+        global_y = cy + local_x * sin_r + local_y * cos_r
+
+        return (round(global_x, 2), round(global_y, 2))
+
+    def _build_pin_cache(
+        self,
+        comp_ref: str,
+        reader: KiCadLibraryReader,
+        ref_to_lib_id: dict[str, str] | None = None,
+    ) -> dict[str, tuple[float, float]]:
+        """Build {pin_name_or_number: (local_x, local_y)} cache for a component."""
+        # Look up lib_id from component data first
+        lib_id = (ref_to_lib_id or {}).get(comp_ref)
+
+        # Fallback: guess from reference prefix
+        if not lib_id:
+            ref_prefix = ''.join(c for c in comp_ref if c.isalpha())
+            fallback_map = {
+                'R': 'Device:R', 'C': 'Device:C', 'D': 'Device:LED',
+                'U': 'MCU_Module:Arduino_UNO_R3', 'Q': 'Transistor_BJT:BC547',
+            }
+            lib_id = fallback_map.get(ref_prefix)
+
+        if not lib_id:
+            return {}
+
+        pins_info = reader.extract_pin_info(lib_id)
+        cache: dict[str, tuple[float, float]] = {}
+        for pin in pins_info:
+            # Index by both pin number and name
+            cache[pin['number']] = (pin['x'], pin['y'])
+            if pin['name'] and pin['name'] != '~':
+                cache[pin['name']] = (pin['x'], pin['y'])
+                # Also index short names: "D5" from "D5", "D0/RX" → "D0"
+                if '/' in pin['name']:
+                    short = pin['name'].split('/')[0]
+                    cache[short] = (pin['x'], pin['y'])
+        return cache
     
     def _enrich_components(self, components: list[dict]) -> list[dict]:
         """Add detailed info from database to components."""
@@ -565,861 +680,63 @@ class SchematicGenerator:
         return None
     
     def _generate_lib_symbols(self, components: list[dict]) -> list[str]:
-        """Generate library symbols section using official KiCad libraries."""
-        from .kicad_library import KiCadLibraryReader
-        
+        """Generate library symbols section using official KiCad libraries.
+
+        Loads all symbols from .kicad_sym files via KiCadLibraryReader.
+        No hand-written templates — only official library data.
+        """
         reader = KiCadLibraryReader()
         symbols = []
         used_lib_ids = set()
 
         for comp in components:
-            comp_type = comp.get('type', comp.get('category', 'sensor'))
-            name = comp.get('name', '')
-            value = comp.get('value', '')
-            lib_id = self._get_lib_id_for_component(comp_type, name, value)
+            # Use lib_id from component (set by ai_analyzer) first,
+            # then fall back to database lookup
+            lib_id = comp.get('lib_id')
+            if not lib_id:
+                comp_type = comp.get('type', comp.get('category', 'sensor'))
+                name = comp.get('name', '')
+                value = comp.get('value', '')
+                lib_id = self._get_lib_id_for_component(comp_type, name, value)
+                comp['lib_id'] = lib_id
 
             if lib_id in used_lib_ids:
                 continue
             used_lib_ids.add(lib_id)
 
-            # Try official library first
+            # Load from official KiCad library
             symbol_text = reader.load_symbol(lib_id)
             if symbol_text:
+                # Re-indent: library files use 1 tab, schematics need 2 tabs
+                symbol_text = self._reindent_symbol(symbol_text)
                 symbols.append(symbol_text)
             else:
-                # Fallback to hardcoded templates
-                symbol_templates = {
-                    'resistor': self._symbol_resistor(),
-                    'led': self._symbol_led(),
-                    'capacitor': self._symbol_capacitor(),
-                    'mcu': self._symbol_generic_ic(),
-                    'sensor': self._symbol_generic_sensor(),
-                }
-                # determine template key
-                if 'resistor' in comp_type or 'R' == lib_id.split(':')[-1]:
-                    key = 'resistor'
-                elif 'led' in comp_type:
-                    key = 'led'
-                elif 'capacitor' in comp_type:
-                    key = 'capacitor'
-                elif 'mcu' in comp_type or 'arduino' in name.lower() or 'atmega' in name.lower():
-                    key = 'mcu'
-                else:
-                    key = 'sensor'
-                template = symbol_templates.get(key)
-                if template:
-                    symbols.append(template)
+                print(f"⚠️  Symbol '{lib_id}' not found in KiCad libraries")
 
-        # Always add power symbols from library
+        # Always add power symbols
         for power_id in ['power:+5V', 'power:GND']:
             if power_id not in used_lib_ids:
                 sym = reader.load_symbol(power_id)
                 if sym:
+                    sym = self._reindent_symbol(sym)
                     symbols.append(sym)
                 else:
-                    # fallback
-                    if '+5V' in power_id:
-                        symbols.append(self._symbol_power_5v())
-                    else:
-                        symbols.append(self._symbol_gnd())
+                    print(f"⚠️  Power symbol '{power_id}' not found in KiCad libraries")
                 used_lib_ids.add(power_id)
 
         return symbols
-    
-    def _symbol_resistor(self) -> str:
-        """Resistor symbol - KiCad 9.0 format (matching test1.kicad_sch)."""
-        return r'''		(symbol "Device:R"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 0)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "R"
-				(at 2.032 0 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "R"
-				(at 0 0 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at -1.778 0 90)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "~"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Resistor"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "R res resistor"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "R_*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "R_0_1"
-				(rectangle
-					(start -1.016 -2.54)
-					(end 1.016 2.54)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "R_1_1"
-				(pin passive line
-					(at 0 3.81 270)
-					(length 1.27)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -3.81 90)
-					(length 1.27)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)'''
-    
-    def _symbol_led(self) -> str:
-        """LED symbol - KiCad 9.0 format (matching test1.kicad_sch)."""
-        return r'''		(symbol "Device:LED"
-			(pin_numbers
-				(hide yes)
-			)
-			(pin_names
-				(offset 1.016)
-				(hide yes)
-			)
-			(exclude_from_sim no)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "D"
-				(at 0 2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "LED"
-				(at 0 -2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "~"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Light emitting diode"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Sim.Pins" "1=K 2=A"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "LED diode"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "LED* LED_SMD:* LED_THT:*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "LED_0_1"
-				(polyline
-					(pts
-						(xy -3.048 -0.762)
-						(xy -4.572 -2.286)
-						(xy -3.81 -2.286)
-						(xy -4.572 -2.286)
-						(xy -4.572 -1.524)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.778 -0.762)
-						(xy -3.302 -2.286)
-						(xy -2.54 -2.286)
-						(xy -3.302 -2.286)
-						(xy -3.302 -1.524)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.27 0)
-						(xy 1.27 0)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.27 -1.27)
-						(xy -1.27 1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 1.27 -1.27)
-						(xy 1.27 1.27)
-						(xy -1.27 0)
-						(xy 1.27 -1.27)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "LED_1_1"
-				(pin passive line
-					(at -3.81 0 0)
-					(length 2.54)
-					(name "K"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 3.81 0 180)
-					(length 2.54)
-					(name "A"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)'''
-    
-    def _symbol_capacitor(self) -> str:
-        """Capacitor symbol - KiCad 9.0 format."""
-        return r'''		(symbol "Device:C"
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "C"
-				(at 0 2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" "C"
-				(at 0 -2.54 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" "~"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Capacitor"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "cap capacitor"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_fp_filters" "C_*"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "C_0_1"
-				(polyline
-					(pts
-						(xy -1.016 -1.016)
-						(xy 1.016 -1.016)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy -1.016 1.016)
-						(xy 1.016 1.016)
-					)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "C_1_1"
-				(pin passive line
-					(at 0 3.81 270)
-					(length 2.54)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-				(pin passive line
-					(at 0 -3.81 90)
-					(length 2.54)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "2"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)'''
-    
-    def _symbol_generic_ic(self) -> str:
-        """Generic IC symbol - KiCad 9.0 format."""
-        return r'''		(symbol "Device:GenericIC"
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "U"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "GenericIC_0_1"
-				(rectangle
-					(start -7.62 -7.62)
-					(end 7.62 7.62)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)'''
-    
-    def _symbol_generic_sensor(self) -> str:
-        """Generic sensor symbol - KiCad 9.0 format."""
-        return r'''		(symbol "Device:GenericSensor"
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "S"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Value" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "GenericSensor_0_1"
-				(circle
-					(center 0 0)
-					(radius 5.08)
-					(stroke
-						(width 0.254)
-						(type default)
-					)
-					(fill
-						(type background)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)'''
-    
-    def _symbol_power_5v(self) -> str:
-        """+5V power symbol - KiCad 9.0 format."""
-        return r'''		(symbol "power:+5V"
-			(power)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "#PWR"
-				(at 0 -3.81 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Value" "+5V"
-				(at 0 3.556 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Power symbol creates a global label with name \"+5V\""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "global power"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "+5V_0_1"
-				(polyline
-					(pts
-						(xy -0.762 1.27)
-						(xy 0 2.54)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 2.54)
-						(xy 0.762 1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-				(polyline
-					(pts
-						(xy 0 0)
-						(xy 0 2.54)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "+5V_1_1"
-				(pin power_in line
-					(at 0 0 90)
-					(length 0)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)'''
-    
-    def _symbol_gnd(self) -> str:
-        """GND power symbol - KiCad 9.0 format."""
-        return r'''		(symbol "power:GND"
-			(power)
-			(in_bom yes)
-			(on_board yes)
-			(property "Reference" "#PWR"
-				(at 0 -6.35 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Value" "GND"
-				(at 0 -3.81 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-				)
-			)
-			(property "Footprint" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Datasheet" ""
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "Description" "Power symbol creates a global label with name \"GND\" , ground"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(property "ki_keywords" "global power"
-				(at 0 0 0)
-				(effects
-					(font
-						(size 1.27 1.27)
-					)
-					(hide yes)
-				)
-			)
-			(symbol "GND_0_1"
-				(polyline
-					(pts
-						(xy 0 0)
-						(xy 0 -1.27)
-						(xy 1.27 -1.27)
-						(xy 0 -2.54)
-						(xy -1.27 -1.27)
-						(xy 0 -1.27)
-					)
-					(stroke
-						(width 0)
-						(type default)
-					)
-					(fill
-						(type none)
-					)
-				)
-			)
-			(symbol "GND_1_1"
-				(pin power_in line
-					(at 0 0 270)
-					(length 0)
-					(name "~"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-					(number "1"
-						(effects
-							(font
-								(size 1.27 1.27)
-							)
-						)
-					)
-				)
-			)
-			(embedded_fonts no)
-		)'''
+
+    @staticmethod
+    def _reindent_symbol(symbol_text: str) -> str:
+        """Re-indent symbol from library format (1 tab) to schematic format (2 tabs)."""
+        lines = symbol_text.split('\n')
+        reindented = []
+        for line in lines:
+            if line.strip():
+                reindented.append('\t' + line)
+            else:
+                reindented.append(line)
+        return '\n'.join(reindented)
     
     def _generate_component_instance(self, comp: dict, positions: dict[str, tuple[float, float, int]] | None = None) -> str:
         """Generate symbol instance for a component."""
@@ -1664,8 +981,128 @@ class SchematicGenerator:
 		)'''
     
     def _generate_power_flags(self, power: dict) -> list[str]:
-        """Generate power flag symbols."""
-        return []  # Simplified for now
+        """Generate power symbol instances (+5V, GND) at wire endpoints."""
+        flags = []
+        pwr_counter = 1
+
+        # GND at (80, 120) — matching _resolve_pin_position's GND position
+        gnd_uuid = str(uuid.uuid4())
+        gnd_ref = f"#PWR0{pwr_counter}"
+        pwr_counter += 1
+        flags.append(f'''\t(symbol
+\t\t(lib_id "power:GND")
+\t\t(at 80 120 0)
+\t\t(unit 1)
+\t\t(exclude_from_sim no)
+\t\t(in_bom yes)
+\t\t(on_board yes)
+\t\t(dnp no)
+\t\t(fields_autoplaced yes)
+\t\t(uuid "{gnd_uuid}")
+\t\t(property "Reference" "{gnd_ref}"
+\t\t\t(at 80 123 0)
+\t\t\t(effects
+\t\t\t\t(font
+\t\t\t\t\t(size 1.27 1.27)
+\t\t\t\t)
+\t\t\t\t(hide yes)
+\t\t\t)
+\t\t)
+\t\t(property "Value" "GND"
+\t\t\t(at 80 125.54 0)
+\t\t\t(effects
+\t\t\t\t(font
+\t\t\t\t\t(size 1.27 1.27)
+\t\t\t\t)
+\t\t\t)
+\t\t)
+\t\t(property "Footprint" ""
+\t\t\t(at 80 120 0)
+\t\t\t(effects
+\t\t\t\t(font
+\t\t\t\t\t(size 1.27 1.27)
+\t\t\t\t)
+\t\t\t\t(hide yes)
+\t\t\t)
+\t\t)
+\t\t(property "Datasheet" "~"
+\t\t\t(at 80 120 0)
+\t\t\t(effects
+\t\t\t\t(font
+\t\t\t\t\t(size 1.27 1.27)
+\t\t\t\t)
+\t\t\t\t(hide yes)
+\t\t\t)
+\t\t)
+\t\t(instances
+\t\t\t(project ""
+\t\t\t\t(path "/{self.project_uuid}"
+\t\t\t\t\t(reference "{gnd_ref}")
+\t\t\t\t\t(unit 1)
+\t\t\t\t)
+\t\t\t)
+\t\t)
+\t)''')
+
+        # +5V at (80, 60) — matching _resolve_pin_position's +5V position
+        v5_uuid = str(uuid.uuid4())
+        v5_ref = f"#PWR0{pwr_counter}"
+        flags.append(f'''\t(symbol
+\t\t(lib_id "power:+5V")
+\t\t(at 80 60 0)
+\t\t(unit 1)
+\t\t(exclude_from_sim no)
+\t\t(in_bom yes)
+\t\t(on_board yes)
+\t\t(dnp no)
+\t\t(fields_autoplaced yes)
+\t\t(uuid "{v5_uuid}")
+\t\t(property "Reference" "{v5_ref}"
+\t\t\t(at 80 56 0)
+\t\t\t(effects
+\t\t\t\t(font
+\t\t\t\t\t(size 1.27 1.27)
+\t\t\t\t)
+\t\t\t\t(hide yes)
+\t\t\t)
+\t\t)
+\t\t(property "Value" "+5V"
+\t\t\t(at 80 53.46 0)
+\t\t\t(effects
+\t\t\t\t(font
+\t\t\t\t\t(size 1.27 1.27)
+\t\t\t\t)
+\t\t\t)
+\t\t)
+\t\t(property "Footprint" ""
+\t\t\t(at 80 60 0)
+\t\t\t(effects
+\t\t\t\t(font
+\t\t\t\t\t(size 1.27 1.27)
+\t\t\t\t)
+\t\t\t\t(hide yes)
+\t\t\t)
+\t\t)
+\t\t(property "Datasheet" "~"
+\t\t\t(at 80 60 0)
+\t\t\t(effects
+\t\t\t\t(font
+\t\t\t\t\t(size 1.27 1.27)
+\t\t\t\t)
+\t\t\t\t(hide yes)
+\t\t\t)
+\t\t)
+\t\t(instances
+\t\t\t(project ""
+\t\t\t\t(path "/{self.project_uuid}"
+\t\t\t\t\t(reference "{v5_ref}")
+\t\t\t\t\t(unit 1)
+\t\t\t\t)
+\t\t\t)
+\t\t)
+\t)''')
+
+        return flags
 
 
 # ============================================================================

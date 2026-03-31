@@ -127,8 +127,18 @@ class EnhancedCircuitAnalyzer:
             print(f"LLM analysis failed ({e}), using fallback")
             analysis = self._fallback_analyze(description)
 
-        # Post-process: expand quantities
-        analysis['components'] = self._expand_quantities(analysis.get('components', []))
+        # Post-process: auto-add current-limiting resistor for LEDs
+        components = analysis.get('components', [])
+        has_led = any(c.get('type') == 'led' for c in components)
+        has_resistor = any(c.get('type') == 'resistor' for c in components)
+        if has_led and not has_resistor:
+            components.insert(0, {
+                'type': 'resistor', 'value': '330', 'quantity': 1,
+                'purpose': 'current limiting',
+            })
+
+        # Expand quantities
+        analysis['components'] = self._expand_quantities(components)
 
         # Assign references
         self._assign_references(analysis['components'])
