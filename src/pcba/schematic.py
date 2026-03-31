@@ -1715,9 +1715,9 @@ def generate_schematic(
     # Step 1: Analyze circuit with enhanced AI analyzer
     analyzer = CircuitAnalyzer(llm, components_db)
     circuit_data = analyzer.analyze(description)
-
-    # Step 2: Validate symbols BEFORE generation
-    from .runtime_verifier import SymbolVerifier, validate_schematic_before_generation
+    
+    # Step 2: Validate symbols AFTER analysis (lib_ids are assigned by analyzer)
+    from .runtime_verifier import SymbolVerifier
     
     verifier = SymbolVerifier()
     validation_result = verifier.verify_components(circuit_data.get('components', []))
