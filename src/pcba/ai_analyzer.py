@@ -133,10 +133,27 @@ class EnhancedCircuitAnalyzer:
         # Assign references
         self._assign_references(analysis['components'])
 
-        # Assign footprints
+        # Assign footprints AND lib_ids
         self._assign_footprints(analysis['components'])
+        self._assign_lib_ids(analysis['components'])
 
         return analysis
+
+    def _assign_lib_ids(self, components: list[dict]) -> None:
+        """Assign lib_id to components that don't have one."""
+        lib_id_map = {
+            'resistor': 'Device:R',
+            'capacitor': 'Device:C',
+            'led': 'Device:LED',
+            'diode': 'Device:D',
+            'arduino': 'MCU_Module:Arduino_UNO_R3',
+            'mcu': 'MCU_Module:Arduino_UNO_R3',  # Default to Arduino for MCU
+        }
+        
+        for comp in components:
+            if 'lib_id' not in comp:
+                comp_type = comp.get('type', 'unknown')
+                comp['lib_id'] = lib_id_map.get(comp_type, 'Device:GenericSensor')
 
     def _llm_analyze(self, description: str) -> dict[str, Any]:
         """Use LLM to analyze circuit description."""
