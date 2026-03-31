@@ -1,0 +1,16 @@
+# PCBAI Machine Learning Dependencies
+
+# For training
+torch>=2.0.0
+transformers>=4.35.0
+datasets>=2.14.0
+
+# For dataset collection
+requests>=2.31.0
+
+# For validation
+sexpdata>=1.0.0
+
+# Optional: For better training
+accelerate>=0.24.0  # Multi-GPU support
+evaluate>=0.4.1     # Evaluation metrics
