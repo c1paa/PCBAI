@@ -1713,39 +1713,11 @@ def generate_schematic(
     llm = LLMClient(config)
 
     # Step 1: Analyze circuit with enhanced AI analyzer
+    # (includes automatic symbol validation and auto-fix)
     analyzer = CircuitAnalyzer(llm, components_db)
     circuit_data = analyzer.analyze(description)
     
-    # Step 2: Validate symbols AFTER analysis (lib_ids are assigned by analyzer)
-    from .runtime_verifier import SymbolVerifier
-    
-    verifier = SymbolVerifier()
-    validation_result = verifier.verify_components(circuit_data.get('components', []))
-    
-    if not validation_result.valid:
-        print(f"\n⚠️  Symbol validation failed:")
-        for error in validation_result.errors:
-            print(f"  ✗ {error}")
-        for warning in validation_result.warnings:
-            print(f"  ⚠ {warning}")
-        
-        if validation_result.suggestions:
-            print("\n  Suggestions:")
-            for sug in validation_result.suggestions:
-                print(f"    - {sug}")
-        
-        # Auto-fix: replace missing symbols with suggestions
-        if validation_result.suggestions and len(validation_result.suggestions) == len(validation_result.missing_symbols):
-            print("\n  Auto-fixing with suggested symbols...")
-            for comp in circuit_data['components']:
-                lib_id = comp.get('lib_id', '')
-                if lib_id in validation_result.missing_symbols:
-                    similar = verifier._find_similar_symbol(lib_id)
-                    if similar:
-                        print(f"    {lib_id} → {similar}")
-                        comp['lib_id'] = similar
-    
-    # Step 3: Handle clarifying questions via dialog manager
+    # Step 2: Handle clarifying questions via dialog manager
     questions = circuit_data.get('questions', [])
     if questions:
         dialog = DialogManager(interactive=interactive)

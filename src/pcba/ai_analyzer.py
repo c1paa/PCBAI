@@ -137,6 +137,22 @@ class EnhancedCircuitAnalyzer:
         self._assign_footprints(analysis['components'])
         self._assign_lib_ids(analysis['components'])
 
+        # Validate symbols BEFORE returning
+        from .runtime_verifier import SymbolVerifier
+        verifier = SymbolVerifier()
+        validation = verifier.verify_components(analysis['components'])
+        
+        if not validation.valid and validation.suggestions:
+            # Auto-fix with suggestions
+            print(f"\n  Auto-fixing symbols...")
+            for comp in analysis['components']:
+                lib_id = comp.get('lib_id', '')
+                if lib_id in validation.missing_symbols:
+                    similar = verifier._find_similar_symbol(lib_id)
+                    if similar:
+                        print(f"    {lib_id} → {similar}")
+                        comp['lib_id'] = similar
+
         return analysis
 
     def _assign_lib_ids(self, components: list[dict]) -> None:
