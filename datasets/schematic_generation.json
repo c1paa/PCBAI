@@ -1,0 +1,2389 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created_by": "PCBAI Dataset Collector",
+    "total_pairs": 27
+  },
+  "training_pairs": [
+    {
+      "input": "KiCad schematic: phase1 complete",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "Arduino UNO R3"
+          },
+          {
+            "ref": "#PWR01",
+            "lib_id": "power:GND",
+            "type": "ground",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR02",
+            "lib_id": "power:+5V",
+            "type": "power",
+            "value": "+5V"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 137.3,
+            "y1": 102.54,
+            "x2": 76.19,
+            "y2": 102.54
+          },
+          {
+            "x1": 76.19,
+            "y1": 102.54,
+            "x2": 76.19,
+            "y2": 90.0
+          },
+          {
+            "x1": 83.81,
+            "y1": 90.0,
+            "x2": 123.81,
+            "y2": 90.0
+          },
+          {
+            "x1": 116.19,
+            "y1": 90.0,
+            "x2": 163.81,
+            "y2": 90.0
+          },
+          {
+            "x1": 156.19,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 120.0
+          }
+        ],
+        "nets": [],
+        "component_count": 10,
+        "wire_count": 6
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/phase1_complete.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: auto verified",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "GND"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "Arduino UNO R3"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "Arduino UNO R3"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "Arduino UNO R3"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Microchip_ATmega:ATmega328P-AU",
+            "type": "mcu",
+            "value": "ATmega328P"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 0.0,
+            "y1": 0.0,
+            "x2": 120.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 120.0,
+            "y1": 90.0,
+            "x2": 160.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 160.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          },
+          {
+            "x1": 120.0,
+            "y1": 90.0,
+            "x2": 200.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 200.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          }
+        ],
+        "nets": [],
+        "component_count": 9,
+        "wire_count": 5
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/auto_verified.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: led",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "#PWR02",
+            "lib_id": "power:+5V",
+            "type": "power",
+            "value": "+5V"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "#PWR01",
+            "lib_id": "power:GND",
+            "type": "ground",
+            "value": "GND"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 134.62,
+            "y1": 92.71,
+            "x2": 138.43,
+            "y2": 92.71
+          },
+          {
+            "x1": 121.92,
+            "y1": 92.71,
+            "x2": 127.0,
+            "y2": 92.71
+          },
+          {
+            "x1": 146.05,
+            "y1": 92.71,
+            "x2": 151.13,
+            "y2": 92.71
+          }
+        ],
+        "nets": [],
+        "component_count": 7,
+        "wire_count": 3
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/led.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: new led",
+      "output": {
+        "components": [
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "220"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "220"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "220"
+          },
+          {
+            "ref": "#PWR02",
+            "lib_id": "power:+5V",
+            "type": "power",
+            "value": "+5V"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "#PWR01",
+            "lib_id": "power:GND",
+            "type": "ground",
+            "value": "GND"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 134.62,
+            "y1": 92.71,
+            "x2": 138.43,
+            "y2": 92.71
+          },
+          {
+            "x1": 121.92,
+            "y1": 92.71,
+            "x2": 127.0,
+            "y2": 92.71
+          },
+          {
+            "x1": 146.05,
+            "y1": 92.71,
+            "x2": 151.13,
+            "y2": 92.71
+          }
+        ],
+        "nets": [],
+        "component_count": 6,
+        "wire_count": 3
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/new_led.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: arduino final",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Microchip_ATmega:ATmega328P-AU",
+            "type": "mcu",
+            "value": "ATmega328P"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 0.0,
+            "y1": 0.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 120.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 120.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 160.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 160.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          }
+        ],
+        "nets": [],
+        "component_count": 8,
+        "wire_count": 5
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/arduino_final.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: final complete",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "Arduino UNO R3"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Microchip_ATmega:ATmega328P-AU",
+            "type": "mcu",
+            "value": "ATmega328P"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 0.0,
+            "y1": 0.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 120.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 120.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 160.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 160.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          }
+        ],
+        "nets": [],
+        "component_count": 9,
+        "wire_count": 5
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/final_complete.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: final test",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Microchip_ATmega:ATmega328P-AU",
+            "type": "mcu",
+            "value": "ATmega328P"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 0.0,
+            "y1": 0.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 120.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 120.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 160.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 160.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          }
+        ],
+        "nets": [],
+        "component_count": 8,
+        "wire_count": 5
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/final_test.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: arduino fixed",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Microchip_ATmega:ATmega328P-AU",
+            "type": "mcu",
+            "value": "ATmega328P"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 0.0,
+            "y1": 0.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 120.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 120.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 160.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 160.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          }
+        ],
+        "nets": [],
+        "component_count": 8,
+        "wire_count": 5
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/arduino_fixed.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: verified",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "ATmega328P"
+          },
+          {
+            "ref": "U2",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "ATmega328P"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Microchip_ATmega:ATmega328P-AU",
+            "type": "mcu",
+            "value": "ATmega328P"
+          }
+        ],
+        "wires": [],
+        "nets": [],
+        "component_count": 8,
+        "wire_count": 0
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/verified.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: qwen verification",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "Arduino UNO R3"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "#PWR01",
+            "lib_id": "power:GND",
+            "type": "ground",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR02",
+            "lib_id": "power:+5V",
+            "type": "power",
+            "value": "+5V"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 137.3,
+            "y1": 102.54,
+            "x2": 76.19,
+            "y2": 102.54
+          },
+          {
+            "x1": 76.19,
+            "y1": 102.54,
+            "x2": 76.19,
+            "y2": 90.0
+          },
+          {
+            "x1": 83.81,
+            "y1": 90.0,
+            "x2": 123.81,
+            "y2": 90.0
+          },
+          {
+            "x1": 116.19,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 120.0
+          },
+          {
+            "x1": 83.81,
+            "y1": 90.0,
+            "x2": 163.81,
+            "y2": 90.0
+          },
+          {
+            "x1": 156.19,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 120.0
+          }
+        ],
+        "nets": [],
+        "component_count": 10,
+        "wire_count": 8
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/qwen_verification.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: fixed symbols",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "GND"
+          },
+          {
+            "ref": "L1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "None"
+          },
+          {
+            "ref": "L1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "None"
+          },
+          {
+            "ref": "L1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "None"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          }
+        ],
+        "wires": [],
+        "nets": [],
+        "component_count": 6,
+        "wire_count": 0
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/fixed_symbols.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: complete verification",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "Arduino UNO R3"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Microchip_ATmega:ATmega328P-AU",
+            "type": "mcu",
+            "value": "ATmega328P"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 0.0,
+            "y1": 0.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 160.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 160.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 200.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 200.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          }
+        ],
+        "nets": [],
+        "component_count": 9,
+        "wire_count": 5
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/complete_verification.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: phase1 final",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "Arduino UNO R3"
+          },
+          {
+            "ref": "#PWR01",
+            "lib_id": "power:GND",
+            "type": "ground",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR02",
+            "lib_id": "power:+5V",
+            "type": "power",
+            "value": "+5V"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 137.3,
+            "y1": 102.54,
+            "x2": 76.19,
+            "y2": 102.54
+          },
+          {
+            "x1": 76.19,
+            "y1": 102.54,
+            "x2": 76.19,
+            "y2": 90.0
+          },
+          {
+            "x1": 83.81,
+            "y1": 90.0,
+            "x2": 123.81,
+            "y2": 90.0
+          },
+          {
+            "x1": 116.19,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 120.0
+          },
+          {
+            "x1": 83.81,
+            "y1": 90.0,
+            "x2": 163.81,
+            "y2": 90.0
+          },
+          {
+            "x1": 156.19,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 120.0
+          }
+        ],
+        "nets": [],
+        "component_count": 10,
+        "wire_count": 8
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/phase1_final.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: test symbols",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "GND"
+          },
+          {
+            "ref": "L1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "330k"
+          },
+          {
+            "ref": "L1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "330k"
+          },
+          {
+            "ref": "L1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "330k"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330k"
+          }
+        ],
+        "wires": [],
+        "nets": [],
+        "component_count": 6,
+        "wire_count": 0
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/test_symbols.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: arduino working",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "Arduino UNO R3"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Microchip_ATmega:ATmega328P-AU",
+            "type": "mcu",
+            "value": "ATmega328P"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 0.0,
+            "y1": 0.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 120.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 120.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 160.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 160.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          }
+        ],
+        "nets": [],
+        "component_count": 9,
+        "wire_count": 5
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/arduino_working.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: absolute final",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "Arduino UNO R3"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "ATmega328P"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 0.0,
+            "y1": 0.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 120.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 120.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          }
+        ],
+        "nets": [],
+        "component_count": 8,
+        "wire_count": 3
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/absolute_final.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: test arduino",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Microchip_ATmega:ATmega328P-AU",
+            "type": "mcu",
+            "value": "ATmega328P"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 0.0,
+            "y1": 0.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 120.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 120.0,
+            "y1": 90.0,
+            "x2": 160.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 160.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          }
+        ],
+        "nets": [],
+        "component_count": 8,
+        "wire_count": 4
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/test_arduino.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: test1",
+      "output": {
+        "components": [
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330R"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330R"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330R"
+          },
+          {
+            "ref": "#PWR02",
+            "lib_id": "power:+5V",
+            "type": "power",
+            "value": "+5V"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "LED"
+          },
+          {
+            "ref": "#PWR01",
+            "lib_id": "power:GND",
+            "type": "ground",
+            "value": "GND"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 134.62,
+            "y1": 92.71,
+            "x2": 138.43,
+            "y2": 92.71
+          },
+          {
+            "x1": 121.92,
+            "y1": 92.71,
+            "x2": 127.0,
+            "y2": 92.71
+          },
+          {
+            "x1": 146.05,
+            "y1": 92.71,
+            "x2": 151.13,
+            "y2": 92.71
+          }
+        ],
+        "nets": [],
+        "component_count": 6,
+        "wire_count": 3
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/test1.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: improved symbols",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "GND"
+          },
+          {
+            "ref": "L1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "LED"
+          },
+          {
+            "ref": "L1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "LED"
+          },
+          {
+            "ref": "L1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "LED"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          }
+        ],
+        "wires": [],
+        "nets": [],
+        "component_count": 6,
+        "wire_count": 0
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/improved_symbols.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: final auto",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "None"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "None"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "None"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Microchip_ATmega:ATmega328P-AU",
+            "type": "mcu",
+            "value": "ATmega328P"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 0.0,
+            "y1": 0.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 120.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 120.0,
+            "y1": 90.0,
+            "x2": 160.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 160.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          }
+        ],
+        "nets": [],
+        "component_count": 9,
+        "wire_count": 4
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/final_auto.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: phase2 test",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "Arduino UNO R3"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "Arduino UNO R3"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "Arduino UNO R3"
+          },
+          {
+            "ref": "#PWR01",
+            "lib_id": "power:GND",
+            "type": "ground",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR02",
+            "lib_id": "power:+5V",
+            "type": "power",
+            "value": "+5V"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 137.3,
+            "y1": 102.54,
+            "x2": 76.19,
+            "y2": 102.54
+          },
+          {
+            "x1": 76.19,
+            "y1": 102.54,
+            "x2": 76.19,
+            "y2": 90.0
+          },
+          {
+            "x1": 83.81,
+            "y1": 90.0,
+            "x2": 123.81,
+            "y2": 90.0
+          },
+          {
+            "x1": 116.19,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 120.0
+          },
+          {
+            "x1": 83.81,
+            "y1": 90.0,
+            "x2": 163.81,
+            "y2": 90.0
+          },
+          {
+            "x1": 156.19,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 120.0
+          }
+        ],
+        "nets": [],
+        "component_count": 10,
+        "wire_count": 8
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/phase2_test.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: test api",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "LED:DPST_FFL",
+            "type": "led",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "LED:DPST_FFL",
+            "type": "led",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "LED:DPST_FFL",
+            "type": "led",
+            "value": "GND"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "LED:DPST_FFL",
+            "type": "led",
+            "value": "330k"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "LED:DPST_FFL",
+            "type": "led",
+            "value": "330k"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "LED:DPST_FFL",
+            "type": "led",
+            "value": "330k"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Resistor_SMD:R_0805",
+            "type": "resistor",
+            "value": "330k"
+          }
+        ],
+        "wires": [],
+        "nets": [],
+        "component_count": 7,
+        "wire_count": 0
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/test_api.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: absolute final phase1",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "?"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "?"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "Arduino UNO R3"
+          },
+          {
+            "ref": "#PWR01",
+            "lib_id": "power:GND",
+            "type": "ground",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR02",
+            "lib_id": "power:+5V",
+            "type": "power",
+            "value": "+5V"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 137.3,
+            "y1": 102.54,
+            "x2": 76.19,
+            "y2": 102.54
+          },
+          {
+            "x1": 76.19,
+            "y1": 102.54,
+            "x2": 76.19,
+            "y2": 90.0
+          },
+          {
+            "x1": 83.81,
+            "y1": 90.0,
+            "x2": 123.81,
+            "y2": 90.0
+          },
+          {
+            "x1": 116.19,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 120.0
+          },
+          {
+            "x1": 83.81,
+            "y1": 90.0,
+            "x2": 163.81,
+            "y2": 90.0
+          },
+          {
+            "x1": 156.19,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 120.0
+          }
+        ],
+        "nets": [],
+        "component_count": 10,
+        "wire_count": 8
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/absolute_final_phase1.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: final verified",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "Arduino UNO R3"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Microchip_ATmega:ATmega328P-AU",
+            "type": "mcu",
+            "value": "ATmega328P"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 0.0,
+            "y1": 0.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 120.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 120.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 160.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 160.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          }
+        ],
+        "nets": [],
+        "component_count": 9,
+        "wire_count": 5
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/final_verified.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: test wires",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Microchip_ATmega:ATmega328P-AU",
+            "type": "mcu",
+            "value": "ATmega328P"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 0.0,
+            "y1": 0.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 120.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 120.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 160.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 160.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          }
+        ],
+        "nets": [],
+        "component_count": 8,
+        "wire_count": 5
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/test_wires.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: phase2 validation",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "Arduino UNO R3"
+          },
+          {
+            "ref": "#PWR01",
+            "lib_id": "power:GND",
+            "type": "ground",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR02",
+            "lib_id": "power:+5V",
+            "type": "power",
+            "value": "+5V"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 137.3,
+            "y1": 102.54,
+            "x2": 76.19,
+            "y2": 102.54
+          },
+          {
+            "x1": 76.19,
+            "y1": 102.54,
+            "x2": 76.19,
+            "y2": 90.0
+          },
+          {
+            "x1": 83.81,
+            "y1": 90.0,
+            "x2": 123.81,
+            "y2": 90.0
+          },
+          {
+            "x1": 116.19,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 120.0
+          },
+          {
+            "x1": 83.81,
+            "y1": 90.0,
+            "x2": 163.81,
+            "y2": 90.0
+          },
+          {
+            "x1": 156.19,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 80.0,
+            "y2": 120.0
+          }
+        ],
+        "nets": [],
+        "component_count": 10,
+        "wire_count": 8
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/phase2_validation.kicad_sch"
+    },
+    {
+      "input": "KiCad schematic: final final",
+      "output": {
+        "components": [
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "#PWR",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "GND"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "R1",
+            "lib_id": "Device:R",
+            "type": "resistor",
+            "value": "330"
+          },
+          {
+            "ref": "D1",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "D2",
+            "lib_id": "Device:LED",
+            "type": "led",
+            "value": "RED"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Module:Arduino_UNO_R3",
+            "type": "mcu",
+            "value": "ATmega328P"
+          },
+          {
+            "ref": "U1",
+            "lib_id": "MCU_Microchip_ATmega:ATmega328P-AU",
+            "type": "mcu",
+            "value": "ATmega328P"
+          }
+        ],
+        "wires": [
+          {
+            "x1": 0.0,
+            "y1": 0.0,
+            "x2": 80.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 120.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 120.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          },
+          {
+            "x1": 80.0,
+            "y1": 90.0,
+            "x2": 160.0,
+            "y2": 90.0
+          },
+          {
+            "x1": 160.0,
+            "y1": 90.0,
+            "x2": 0.0,
+            "y2": 0.0
+          }
+        ],
+        "nets": [],
+        "component_count": 9,
+        "wire_count": 5
+      },
+      "source_file": "/Users/vladglazunov/Documents/algo/PCBAI/examples/test1/final_final.kicad_sch"
+    }
+  ]
+}
