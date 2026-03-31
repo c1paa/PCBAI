@@ -318,7 +318,7 @@ class ReadabilityValidator:
         count = 0
         for i, comp1 in enumerate(components):
             for comp2 in components[i+1:]:
-                distance = ((comp1['x'] - comp2['x'])**2 + **(comp1['y'] - comp2['y'])2)**0.5
+                distance = ((comp1['x'] - comp2['x'])**2 + (comp1['y'] - comp2['y'])**2)**0.5
                 if distance < min_distance:
                     count += 1
         return count
