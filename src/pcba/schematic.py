@@ -56,18 +56,6 @@ KICAD_COMPONENTS = {
             "A0": "9", "A1": "10", "A2": "11", "A3": "12", "A4": "13", "A5": "14",
         }
     },
-    "atmega328p": {
-        "lib_id": "MCU_Microchip_ATmega:ATmega328P-AU",
-        "footprint": "Package_QFP:TQFP-32_7x7mm_P0.8mm",
-        "pins": {
-            "VCC": ["19", "30"],
-            "GND": ["20", "31"],
-            "XTAL1": "16",
-            "XTAL2": "15",
-            "RESET": "1",
-            "GPIO": ["2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13", "14", "17", "18", "21", "22", "23", "24", "25", "26", "27", "28", "29", "32"]
-        }
-    },
     "dht22": {
         "lib_id": "Sensor:DHT11",
         "footprint": "Sensor:AOSONG_DHT11_5.5x12.0_P2.54mm",
@@ -1526,12 +1514,13 @@ class SchematicGenerator:
         if comp_type in kicad_db:
             return kicad_db[comp_type].get('lib_id', f"Device:{comp_type.upper()}")
 
-        # Match by name - check arduino FIRST before atmega
+        # Match by name - check arduino FIRST
         name_lower = name.lower()
         if 'arduino' in name_lower:
             return kicad_db.get('arduino', {}).get('lib_id', 'MCU_Module:Arduino_UNO_R3')
         elif 'atmega' in name_lower:
-            return kicad_db.get('atmega328p', {}).get('lib_id', 'MCU_Microchip_ATmega:ATmega328P-AU')
+            # Fallback to ATmega if explicitly requested
+            return 'MCU_Microchip_ATmega:ATmega328P-AU'
         elif 'esp32' in name_lower:
             return kicad_db.get('esp32_wroom', {}).get('lib_id', 'PCM_Espressif:ESP32-WROOM-32E')
         elif 'dht' in name_lower:
