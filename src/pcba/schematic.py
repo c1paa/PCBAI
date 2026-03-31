@@ -476,8 +476,8 @@ class SchematicGenerator:
         """Generate library symbols section."""
         symbols = []
         used_symbols = set()
-        
-        # Symbol templates (simplified - in production, load from files)
+
+        # Symbol templates
         symbol_templates = {
             'resistor': self._symbol_resistor(),
             'led': self._symbol_led(),
@@ -485,20 +485,47 @@ class SchematicGenerator:
             'mcu': self._symbol_generic_ic(),
             'sensor': self._symbol_generic_sensor(),
         }
-        
+
         for comp in components:
             category = comp.get('category', 'sensor')
+            comp_type = comp.get('type', '')
+            name = comp.get('name', '').lower()
+            lib_id = comp.get('lib_id', '')
+
+            # Determine which symbol to use based on multiple factors
+            symbol_to_add = None
             
-            if category not in used_symbols:
-                template = symbol_templates.get(category, symbol_templates['sensor'])
+            # Check by lib_id first (most reliable)
+            if 'R' in lib_id or 'resistor' in comp_type or 'resistor' in name:
+                symbol_to_add = 'resistor'
+            elif 'LED' in lib_id or 'led' in comp_type or 'led' in name:
+                symbol_to_add = 'led'
+            elif 'C' in lib_id or 'capacitor' in comp_type or 'capacitor' in name:
+                symbol_to_add = 'capacitor'
+            elif 'ATmega' in name or 'ESP32' in name or 'arduino' in name:
+                symbol_to_add = 'mcu'
+            elif category == 'resistor':
+                symbol_to_add = 'resistor'
+            elif category == 'led':
+                symbol_to_add = 'led'
+            elif category == 'capacitor':
+                symbol_to_add = 'capacitor'
+            elif category == 'mcu':
+                symbol_to_add = 'mcu'
+            else:
+                symbol_to_add = 'sensor'  # Default
+            
+            # Add symbol if not already added
+            if symbol_to_add and symbol_to_add not in used_symbols:
+                template = symbol_templates.get(symbol_to_add)
                 if template:
                     symbols.append(template)
-                    used_symbols.add(category)
-        
+                    used_symbols.add(symbol_to_add)
+
         # Always add power symbols
         symbols.append(self._symbol_power_5v())
         symbols.append(self._symbol_gnd())
-        
+
         return symbols
     
     def _symbol_resistor(self) -> str:
