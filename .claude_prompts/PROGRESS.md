@@ -78,13 +78,45 @@
 ## PHASE 2: Validation System (AFTER PHASE 1)
 
 ### Task 2.1: Connectivity Validator
-- [ ] **Status:** PENDING
+- [x] **Status:** DONE
+- [x] **File:** `src/pcba/circuit_validator.py`
+- [x] **Implementation:**
+  - `ConnectivityValidator.validate()` checks all pins connected
+  - Detects floating components and floating nets
+  - Builds connectivity graph from schematic
+- [x] **Test:** ✓ Connectivity: PASS
 
 ### Task 2.2: ERC Validator
-- [ ] **Status:** PENDING
+- [x] **Status:** DONE
+- [x] **File:** `src/pcba/circuit_validator.py`
+- [x] **Implementation:**
+  - `ERCValidator.validate()` checks electrical rules
+  - LED current-limiting resistors
+  - MCU power connections (VCC, GND)
+- [x] **Test:** ✓ ERC: PASS
 
 ### Task 2.3: Readability Score
-- [ ] **Status:** PENDING
+- [x] **Status:** DONE
+- [x] **File:** `src/pcba/circuit_validator.py`
+- [x] **Implementation:**
+  - `ReadabilityValidator.calculate_score()` returns 0-100%
+  - Checks: component overlap, spacing, alignment
+  - Rating: Excellent (90+), Good (70+), Fair (50+), Poor (<50)
+- [x] **Test:** ✓ Readability: 88.0% (Good)
+
+### Task 2.4: Integration
+- [x] **Status:** DONE
+- [x] **File:** `src/pcba/schematic.py`
+- [x] **Changes:**
+  - Step 5: Connectivity + ERC + Readability validation
+  - Step 6: kicad-cli validation
+- [x] **Test output:**
+  ```
+  ✓ Connectivity: PASS
+  ✓ ERC: PASS
+  ✓ Readability: 88.0% (Good)
+  ✓ Schematic generated
+  ```
 
 ---
 
