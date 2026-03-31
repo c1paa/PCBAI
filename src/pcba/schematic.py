@@ -1751,11 +1751,23 @@ def generate_schematic(
     # Write file
     output_path.write_text(content)
 
+    # Step 5: Validate with kicad-cli
+    from .validator import KiCadValidator
+    validator = KiCadValidator()
+    result = validator.validate_schematic(output_path)
+
     n_comps = len(circuit_data.get('components', []))
     n_conns = len(circuit_data.get('connections', []))
     config_type = circuit_data.get('configuration', 'custom')
 
-    print(f"✓ Schematic generated: {output_path}")
-    print(f"  Components: {n_comps}, Connections: {n_conns}, Configuration: {config_type}")
+    if result.valid:
+        print(f"✓ Schematic generated: {output_path}")
+        print(f"  Components: {n_comps}, Connections: {n_conns}, Configuration: {config_type}")
+    else:
+        print(f"⚠️ Schematic generated but validation found issues:")
+        for error in result.errors:
+            print(f"  ✗ {error}")
+        for warning in result.warnings:
+            print(f"  ⚠ {warning}")
 
     return output_path
