@@ -1178,7 +1178,28 @@ def generate_schematic(
     # Write file
     output_path.write_text(content)
 
-    # Step 5: Validate with kicad-cli
+    # Step 5: Validate schematic (connectivity, ERC, readability)
+    from .circuit_validator import validate_schematic
+    
+    print("\n  Validating schematic...")
+    validation = validate_schematic(output_path)
+    
+    if validation['connectivity'].valid:
+        print(f"  ✓ Connectivity: PASS")
+    else:
+        for error in validation['connectivity'].errors:
+            print(f"  ✗ {error}")
+    
+    if validation['erc'].valid:
+        print(f"  ✓ ERC: PASS")
+    else:
+        for error in validation['erc'].errors:
+            print(f"  ✗ {error}")
+    
+    readability = validation['readability']
+    print(f"  ✓ Readability: {readability['score']:.1f}% ({readability['rating']})")
+    
+    # Step 6: Validate with kicad-cli
     from .validator import KiCadValidator
     validator = KiCadValidator()
     result = validator.validate_schematic(output_path)
@@ -1188,13 +1209,11 @@ def generate_schematic(
     config_type = circuit_data.get('configuration', 'custom')
 
     if result.valid:
-        print(f"✓ Schematic generated: {output_path}")
+        print(f"\n✓ Schematic generated: {output_path}")
         print(f"  Components: {n_comps}, Connections: {n_conns}, Configuration: {config_type}")
     else:
-        print(f"⚠️ Schematic generated but validation found issues:")
+        print(f"\n⚠️ Schematic generated but kicad-cli validation failed:")
         for error in result.errors:
             print(f"  ✗ {error}")
-        for warning in result.warnings:
-            print(f"  ⚠ {warning}")
 
     return output_path
